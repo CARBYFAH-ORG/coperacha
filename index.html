@@ -341,12 +341,13 @@
       <!-- CONFIGURACIÓN (admin) -->
       <section class="view" id="v-config">
         <div class="page-title">Configuración</div>
-        <div class="page-sub">Parámetros generales del sistema.</div>
+        <div class="page-sub">Parámetros generales del sistema. Los meses se generan desde el inicio hasta el fin.</div>
         <div class="panel"><div class="panel-b">
           <div class="field"><label>Nombre del grupo</label><input id="cf-nombre"></div>
+          <div class="field"><label>Monto por defecto (L.)</label><input id="cf-monto" type="number" min="0" step="0.01" inputmode="decimal"></div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-            <div class="field"><label>Monto por defecto (L.)</label><input id="cf-monto" type="number" min="0" step="0.01" inputmode="decimal"></div>
             <div class="field"><label>Mes de inicio</label><input id="cf-inicio" type="month"></div>
+            <div class="field"><label>Mes de fin</label><input id="cf-fin" type="month"></div>
           </div>
           <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:8px">
             <button class="btn btn-primary" id="cf-save">Guardar cambios</button>
@@ -461,7 +462,7 @@
 /* ════════════════════════════════════════════════════════════════
    CONFIGURACIÓN
    ════════════════════════════════════════════════════════════════ */
-const API_URL = "https://script.google.com/macros/s/AKfycbzngXL4vC_SSAxU6JRNjzTOfXmEJzONb6wObHxrib4P5SyBxnmrl9jplSMskfxe0_7gaQ/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwvVh3Wya5yzgiejc0s8mWJobm3t-0fs1m_Bkx2LKKdhF8Lzk7ta3ifD4HvMLHZIPUw4Q/exec";
 
 /* ════════════════════════════════════════════════════════════════
    ESTADO Y HELPERS
@@ -518,20 +519,27 @@ function mesLabel(yyyymm){
   if (idx<0||idx>11) return yyyymm;
   return MESES_ES[idx] + ' ' + y;
 }
-function listarMeses(mesInicio){
+function listarMeses(mesInicio, mesFin){
   const now = new Date();
   const yn = now.getFullYear(), mn = now.getMonth() + 1;
   let yi, mi;
   if (/^\d{4}-\d{2}$/.test(mesInicio||'')){
     [yi, mi] = mesInicio.split('-').map(Number);
   } else {
-    // Fallback: últimos 12 meses
-    yi = yn; mi = mn - 11;
-    while (mi < 1){ mi += 12; yi--; }
+    // Sin mes_inicio: empieza desde el mes actual
+    yi = yn; mi = mn;
+  }
+  let yf, mf;
+  if (/^\d{4}-\d{2}$/.test(mesFin||'')){
+    [yf, mf] = mesFin.split('-').map(Number);
+  } else {
+    // Sin mes_fin: hasta diciembre del año del inicio (o del actual si es mayor)
+    yf = Math.max(yi, yn);
+    mf = 12;
   }
   const out = [];
-  let y = yi, m = mi;
-  while (y < yn || (y === yn && m <= mn)){
+  let y = yi, m = mi, safety = 120;
+  while ((y < yf || (y === yf && m <= mf)) && safety-- > 0){
     out.push(y + '-' + pad(m));
     m++;
     if (m > 12){ m = 1; y++; }
@@ -700,7 +708,7 @@ async function refrescar(){
    ════════════════════════════════════════════════════════════════ */
 function pintarDashboard(){
   const mAct = mesActual();
-  const meses = listarMeses(DATA.config.mes_inicio);
+  const meses = listarMeses(DATA.config.mes_inicio, DATA.config.mes_fin);
   const totalPersonas = DATA.personas.length;
   const pagosMes = DATA.pagos.filter(p => p.mes === mAct);
   const pagosTodos = DATA.pagos;
@@ -773,7 +781,7 @@ function pintarMiEstado(){
   document.getElementById('mi-titulo').textContent = persona ? persona.nombre : 'Mi estado';
   document.getElementById('mi-sub').textContent = 'Historial de tus aportes mes a mes.';
 
-  const meses = listarMeses(DATA.config.mes_inicio);
+  const meses = listarMeses(DATA.config.mes_inicio, DATA.config.mes_fin);
   const misPagos = DATA.pagos.filter(p => p.personaId === pid);
   const mapa = {}; misPagos.forEach(p => { mapa[p.mes] = p; });
   const pagados = misPagos.length;
@@ -888,7 +896,7 @@ async function borrarPersona(id, btn){
    PAGOS (admin) — botón único "+ Registrar pago" con selector de mes
    ════════════════════════════════════════════════════════════════ */
 function pintarPagosMesSelect(){
-  const meses = listarMeses(DATA.config.mes_inicio);
+  const meses = listarMeses(DATA.config.mes_inicio, DATA.config.mes_fin);
   const sel = document.getElementById('pag-mes');
   const prev = sel.value;
   sel.innerHTML = '<option value="">Todos los meses</option>' +
@@ -997,7 +1005,7 @@ function llenarSelectoresPago(personaSel, mesSel){
   document.getElementById('pago-persona').innerHTML =
     (personaSel ? '' : '<option value="">— Elige persona —</option>') +
     personasOrdenadas.map(p => `<option value="${p.id}" ${personaSel===p.id?'selected':''}>${esc(p.nombre)}</option>`).join('');
-  const meses = listarMeses(DATA.config.mes_inicio);
+  const meses = listarMeses(DATA.config.mes_inicio, DATA.config.mes_fin);
   const mesActualKey = mesActual();
   const mesParaSeleccionar = mesSel || (meses.indexOf(mesActualKey) >= 0 ? mesActualKey : meses[meses.length-1]);
   document.getElementById('pago-mes-sel').innerHTML =
@@ -1190,7 +1198,7 @@ async function borrarGasto(id, btn){
    REPORTES
    ════════════════════════════════════════════════════════════════ */
 function pintarReportesFiltros(){
-  const meses = listarMeses(DATA.config.mes_inicio);
+  const meses = listarMeses(DATA.config.mes_inicio, DATA.config.mes_fin);
   const selMes = document.getElementById('rep-mes');
   const selPer = document.getElementById('rep-persona');
   const prevM = selMes.value, prevP = selPer.value;
@@ -1468,18 +1476,23 @@ function pintarConfig(){
   document.getElementById('cf-nombre').value = DATA.config.nombre_grupo || '';
   document.getElementById('cf-monto').value = DATA.config.monto_default || '200';
   document.getElementById('cf-inicio').value = DATA.config.mes_inicio || '';
+  document.getElementById('cf-fin').value = DATA.config.mes_fin || '';
 }
 document.getElementById('cf-save').addEventListener('click', async function(){
   const nombre = document.getElementById('cf-nombre').value.trim();
   const monto = document.getElementById('cf-monto').value.trim();
   const inicio = document.getElementById('cf-inicio').value.trim();
+  const fin = document.getElementById('cf-fin').value.trim();
   if (!/^\d{4}-\d{2}$/.test(inicio)){ toast('Mes de inicio inválido.', 'err'); return; }
+  if (!/^\d{4}-\d{2}$/.test(fin)){ toast('Mes de fin inválido.', 'err'); return; }
+  if (fin < inicio){ toast('El mes de fin no puede ser anterior al de inicio.', 'err'); return; }
   if (isNaN(parseFloat(monto)) || parseFloat(monto) < 0){ toast('Monto inválido.', 'err'); return; }
   setLoading(this, true);
   try{
     await api({ action:'set_config', token:S.token, llave:'nombre_grupo', valor:nombre });
     await api({ action:'set_config', token:S.token, llave:'monto_default', valor:monto });
     await api({ action:'set_config', token:S.token, llave:'mes_inicio', valor:inicio });
+    await api({ action:'set_config', token:S.token, llave:'mes_fin', valor:fin });
     toast('Configuración guardada.', 'ok');
     await refrescar();
     pintarConfig();
