@@ -88,12 +88,27 @@
   .toolbar input:focus,.toolbar select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
   .btn{border:1px solid var(--border);background:var(--card);color:var(--text);border-radius:10px;padding:10px 15px;font-size:.88rem;font-weight:600;transition:.14s;display:inline-flex;align-items:center;gap:7px}
   .btn:hover{background:var(--soft)}
+  .btn:disabled{opacity:.65;cursor:not-allowed}
   .btn svg{width:16px;height:16px}
   .btn-primary{background:var(--primary);border-color:var(--primary);color:#fff}
   .btn-primary:hover{background:var(--primary-dark)}
   .btn-danger{color:var(--red-text);border-color:#fca5a5}
   .btn-danger:hover{background:var(--red-soft)}
   .btn-sm{padding:6px 10px;font-size:.78rem;border-radius:8px}
+
+  /* Spinner para botones en carga */
+  .btn.loading{position:relative;color:transparent!important;pointer-events:none;cursor:wait;opacity:1}
+  .btn.loading svg{visibility:hidden}
+  .btn.loading::after{
+    content:"";position:absolute;left:50%;top:50%;
+    width:14px;height:14px;margin:-7px 0 0 -7px;
+    border:2px solid #465fff;border-right-color:transparent;
+    border-radius:50%;animation:spin .65s linear infinite
+  }
+  .btn-primary.loading::after{border-color:#fff;border-right-color:transparent}
+  .btn-danger.loading::after{border-color:#b91c1c;border-right-color:transparent}
+  .btn-sm.loading::after{width:11px;height:11px;margin:-5.5px 0 0 -5.5px;border-width:2px}
+  @keyframes spin{to{transform:rotate(360deg)}}
 
   .tbl-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);overflow-x:auto}
   table{width:100%;border-collapse:collapse}
@@ -263,10 +278,15 @@
 
       <!-- PAGOS (admin) -->
       <section class="view" id="v-pagos">
-        <div class="page-title">Pagos por mes</div>
-        <div class="page-sub">Marca quién ha pagado en cada mes. Monto por defecto definido en Configuración.</div>
+        <div class="sect-h">
+          <div class="sh-left">
+            <div class="page-title">Pagos</div>
+            <div class="page-sub">Registra pagos eligiendo persona y mes. Filtra abajo para ver por mes específico.</div>
+          </div>
+          <div class="sh-right"><button class="btn btn-primary" onclick="abrirNuevoPago()">+ Registrar pago</button></div>
+        </div>
         <div class="toolbar">
-          <label style="font-size:.85rem;color:var(--text-dim);font-weight:500">Mes:</label>
+          <label style="font-size:.85rem;color:var(--text-dim);font-weight:500">Ver mes:</label>
           <select id="pag-mes"></select>
           <input type="search" id="pag-busca" class="grow" placeholder="Buscar persona…">
         </div>
@@ -368,7 +388,8 @@
   <div class="modal">
     <div class="modal-h"><h3 id="pago-modal-title">Registrar pago</h3><button class="modal-x" onclick="cerrar('ov-pago')">&times;</button></div>
     <div class="modal-b">
-      <p id="pago-quien" style="color:var(--text-dim);font-size:.9rem;margin-bottom:16px"></p>
+      <div class="field"><label>Persona *</label><select id="pago-persona"></select></div>
+      <div class="field"><label>Mes *</label><select id="pago-mes-sel"></select></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
         <div class="field"><label>Monto (L.)</label><input id="pago-monto" type="number" min="0" step="0.01" inputmode="decimal"></div>
         <div class="field"><label>Fecha de pago</label><input id="pago-fecha" type="date"></div>
@@ -498,11 +519,17 @@ function mesLabel(yyyymm){
   return MESES_ES[idx] + ' ' + y;
 }
 function listarMeses(mesInicio){
-  const out = [];
-  if (!/^\d{4}-\d{2}$/.test(mesInicio||'')) return out;
-  const [yi, mi] = mesInicio.split('-').map(Number);
   const now = new Date();
   const yn = now.getFullYear(), mn = now.getMonth() + 1;
+  let yi, mi;
+  if (/^\d{4}-\d{2}$/.test(mesInicio||'')){
+    [yi, mi] = mesInicio.split('-').map(Number);
+  } else {
+    // Fallback: últimos 12 meses
+    yi = yn; mi = mn - 11;
+    while (mi < 1){ mi += 12; yi--; }
+  }
+  const out = [];
   let y = yi, m = mi;
   while (y < yn || (y === yn && m <= mn)){
     out.push(y + '-' + pad(m));
@@ -530,6 +557,11 @@ setInterval(reloj, 1000);
 
 function abrir(id){ document.getElementById(id).classList.add('show'); }
 function cerrar(id){ document.getElementById(id).classList.remove('show'); }
+function setLoading(btn, on){
+  if (!btn) return;
+  if (on){ btn.classList.add('loading'); btn.disabled = true; }
+  else { btn.classList.remove('loading'); btn.disabled = false; }
+}
 document.querySelectorAll('.overlay').forEach(o => o.addEventListener('click', e => {
   if (e.target === o) o.classList.remove('show');
 }));
@@ -615,7 +647,7 @@ async function entrar(){
   err.classList.remove('show');
   if (!usuario || !pass){ err.textContent='Escribe usuario y contraseña.'; err.classList.add('show'); return; }
   const btn = document.getElementById('lg-btn');
-  btn.disabled = true; btn.textContent = 'Entrando…';
+  setLoading(btn, true);
   try{
     const res = await api({ action:'login', usuario, pass });
     if (!res.ok){ err.textContent = res.error || 'No se pudo iniciar sesión.'; err.classList.add('show'); return; }
@@ -624,7 +656,7 @@ async function entrar(){
     store.set('coop_sesion', JSON.stringify(S.sesion));
     await arrancar();
   } catch(e){ err.textContent = e.message; err.classList.add('show'); }
-  finally{ btn.disabled = false; btn.textContent = 'Entrar'; }
+  finally{ setLoading(btn, false); }
 }
 
 function salir(expirada){
@@ -796,7 +828,7 @@ function pintarPersonas(){
       <td data-label="Registrado">${esc(p.registradoEn)}</td>
       <td data-label="Acciones"><div class="acts">
         <button class="btn btn-sm" onclick="abrirPersona('${p.id}')">✏ Editar</button>
-        <button class="btn btn-sm btn-danger" onclick="borrarPersona('${p.id}')">Borrar</button>
+        <button class="btn btn-sm btn-danger" onclick="borrarPersona('${p.id}', this)">Borrar</button>
       </div></td>
     </tr>`;
   }).join('');
@@ -818,7 +850,7 @@ function abrirPersona(id){
 document.getElementById('per-save').addEventListener('click', async function(){
   const nombre = document.getElementById('per-nombre').value.trim();
   if (!nombre){ toast('Escribe el nombre.', 'err'); return; }
-  this.disabled = true;
+  setLoading(this, true);
   try{
     const params = editingPersonaId
       ? { action:'editar_persona', token:S.token, id:editingPersonaId, nombre }
@@ -830,10 +862,10 @@ document.getElementById('per-save').addEventListener('click', async function(){
     await refrescar();
     pintarPersonas();
   } catch(e){ toast(e.message, 'err'); }
-  finally{ this.disabled = false; }
+  finally{ setLoading(this, false); }
 });
 
-async function borrarPersona(id){
+async function borrarPersona(id, btn){
   const p = DATA.personas.find(x => x.id === id);
   const ok = await confirmar({
     titulo: 'Borrar persona',
@@ -842,56 +874,96 @@ async function borrarPersona(id){
     danger: true
   });
   if (!ok) return;
+  setLoading(btn, true);
   try{
     const res = await api({ action:'borrar_persona', token:S.token, id });
     if (!res.ok) throw new Error(res.error);
     toast('Persona borrada.', 'ok');
     await refrescar();
     pintarPersonas();
-  } catch(e){ toast(e.message, 'err'); }
+  } catch(e){ toast(e.message, 'err'); setLoading(btn, false); }
 }
 
 /* ════════════════════════════════════════════════════════════════
-   PAGOS POR MES (admin)
+   PAGOS (admin) — botón único "+ Registrar pago" con selector de mes
    ════════════════════════════════════════════════════════════════ */
 function pintarPagosMesSelect(){
   const meses = listarMeses(DATA.config.mes_inicio);
   const sel = document.getElementById('pag-mes');
   const prev = sel.value;
-  if (!meses.length){
-    sel.innerHTML = '<option value="">— Configura el mes de inicio —</option>';
-    return;
+  sel.innerHTML = '<option value="">Todos los meses</option>' +
+    meses.slice().reverse().map(m => `<option value="${m}">${esc(mesLabel(m))}</option>`).join('');
+  if (prev !== undefined && (prev === '' || meses.indexOf(prev) >= 0)){
+    sel.value = prev;
+  } else {
+    const ma = mesActual();
+    sel.value = (meses.indexOf(ma) >= 0) ? ma : '';
   }
-  sel.innerHTML = meses.slice().reverse().map(m => `<option value="${m}">${esc(mesLabel(m))}</option>`).join('');
-  if (prev && meses.indexOf(prev) >= 0) sel.value = prev;
-  else { const ma = mesActual(); sel.value = (meses.indexOf(ma) >= 0) ? ma : meses[meses.length - 1]; }
 }
 function pintarPagosTabla(){
   const mes = document.getElementById('pag-mes').value;
   const q = (document.getElementById('pag-busca').value || '').toLowerCase();
   const personas = DATA.personas.slice().sort((a,b) => a.nombre.localeCompare(b.nombre));
+  const cardsEl = document.getElementById('pag-cards');
+  const cont = document.getElementById('tbl-pagos');
+
+  if (!mes){
+    // Vista "Todos los meses" — lista de pagos registrados
+    let pagos = DATA.pagos.slice();
+    if (q){
+      pagos = pagos.filter(pg => {
+        const per = DATA.personas.find(x => x.id === pg.personaId);
+        return per && per.nombre.toLowerCase().indexOf(q) !== -1;
+      });
+    }
+    pagos.sort((a,b) => (b.mes||'').localeCompare(a.mes||'') || (b.fechaPago||'').localeCompare(a.fechaPago||''));
+    const total = pagos.reduce((s,p) => s + (Number(p.monto)||0), 0);
+    const cards = [
+      { n: pagos.length, l:'Pagos registrados', ic:'green', svg:'<path d="M20 6 9 17l-5-5"/>' },
+      { n: personas.length, l:'Personas registradas', ic:'blue', svg:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>' },
+      { n: fmtL(total), l:'Total recaudado', ic:'slate', svg:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>' }
+    ];
+    cardsEl.innerHTML = cards.map(c =>
+      `<div class="stat"><div class="ico ${c.ic}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${c.svg}</svg></div><div class="n">${c.n}</div><div class="l">${esc(c.l)}</div></div>`
+    ).join('');
+    if (!pagos.length){
+      cont.innerHTML = '<div class="tbl-empty">No hay pagos registrados todavía. Usa "+ Registrar pago" para comenzar.</div>';
+      return;
+    }
+    const filas = pagos.map(pg => {
+      const per = DATA.personas.find(p => p.id === pg.personaId);
+      const nombre = per ? per.nombre : pg.personaId;
+      return `<tr>
+        <td data-label="Persona"><span class="nm">${esc(nombre)}</span></td>
+        <td data-label="Mes">${esc(mesLabel(pg.mes))}</td>
+        <td data-label="Monto"><span class="money">${fmtL(pg.monto)}</span></td>
+        <td data-label="Fecha">${esc(pg.fechaPago)}</td>
+        <td data-label="Acciones"><div class="acts">
+          <button class="btn btn-sm" onclick="abrirEditarPago('${pg.id}')">✏ Editar</button>
+          <button class="btn btn-sm btn-danger" onclick="revertirPago('${pg.id}','${esc(nombre)}', this)">↺ Revertir</button>
+        </div></td>
+      </tr>`;
+    }).join('');
+    cont.innerHTML = `<table><thead><tr><th>Persona</th><th>Mes</th><th>Monto</th><th>Fecha de pago</th><th></th></tr></thead><tbody>${filas}</tbody></table>`;
+    return;
+  }
+
+  // Vista de un mes específico — matriz de personas
   const lista = q ? personas.filter(p => p.nombre.toLowerCase().indexOf(q) !== -1) : personas;
   const pagosMes = DATA.pagos.filter(p => p.mes === mes);
   const mapa = {}; pagosMes.forEach(p => { mapa[p.personaId] = p; });
-
-  // Stats del mes
   const recaudado = pagosMes.reduce((s,p) => s + (Number(p.monto)||0), 0);
   const cards = [
     { n: pagosMes.length + '/' + personas.length, l:'Pagaron', ic:'green', svg:'<path d="M20 6 9 17l-5-5"/>' },
     { n: Math.max(0, personas.length - pagosMes.length), l:'Pendientes', ic:'amber', svg:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>' },
     { n: fmtL(recaudado), l:'Recaudado', ic:'slate', svg:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>' }
   ];
-  document.getElementById('pag-cards').innerHTML = cards.map(c =>
+  cardsEl.innerHTML = cards.map(c =>
     `<div class="stat"><div class="ico ${c.ic}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${c.svg}</svg></div><div class="n">${c.n}</div><div class="l">${esc(c.l)}</div></div>`
   ).join('');
 
-  const cont = document.getElementById('tbl-pagos');
   if (!personas.length){
     cont.innerHTML = '<div class="tbl-empty">No hay personas registradas. Ve a "Personas" para agregarlas.</div>';
-    return;
-  }
-  if (!mes){
-    cont.innerHTML = '<div class="tbl-empty">Selecciona un mes para ver los pagos.</div>';
     return;
   }
   if (!lista.length){
@@ -902,8 +974,8 @@ function pintarPagosTabla(){
     const pg = mapa[per.id];
     const acc = pg
       ? `<button class="btn btn-sm" onclick="abrirEditarPago('${pg.id}')">✏ Editar</button>
-         <button class="btn btn-sm btn-danger" onclick="revertirPago('${pg.id}','${esc(per.nombre)}')">↺ Revertir</button>`
-      : `<button class="btn btn-sm btn-primary" onclick="abrirMarcarPago('${per.id}')">💲 Marcar pago</button>`;
+         <button class="btn btn-sm btn-danger" onclick="revertirPago('${pg.id}','${esc(per.nombre)}', this)">↺ Revertir</button>`
+      : `<button class="btn btn-sm btn-primary" onclick="abrirMarcarPago('${per.id}','${mes}')">💲 Marcar pago</button>`;
     return `<tr>
       <td data-label="Persona"><span class="nm">${esc(per.nombre)}</span></td>
       <td data-label="Estado">${pg ? '<span class="pill pago">Pagó</span>' : '<span class="pill nopago">No pagó</span>'}</td>
@@ -920,60 +992,96 @@ function pintarPagosTabla(){
   el.addEventListener('input',  pintarPagosTabla);
 });
 
-function abrirMarcarPago(personaId){
-  const per = DATA.personas.find(p => p.id === personaId);
-  if (!per) return;
+function llenarSelectoresPago(personaSel, mesSel){
+  const personasOrdenadas = DATA.personas.slice().sort((a,b) => a.nombre.localeCompare(b.nombre));
+  document.getElementById('pago-persona').innerHTML =
+    (personaSel ? '' : '<option value="">— Elige persona —</option>') +
+    personasOrdenadas.map(p => `<option value="${p.id}" ${personaSel===p.id?'selected':''}>${esc(p.nombre)}</option>`).join('');
+  const meses = listarMeses(DATA.config.mes_inicio);
+  const mesActualKey = mesActual();
+  const mesParaSeleccionar = mesSel || (meses.indexOf(mesActualKey) >= 0 ? mesActualKey : meses[meses.length-1]);
+  document.getElementById('pago-mes-sel').innerHTML =
+    meses.slice().reverse().map(m => `<option value="${m}" ${mesParaSeleccionar===m?'selected':''}>${esc(mesLabel(m))}</option>`).join('');
+}
+
+function abrirNuevoPago(){
+  if (!DATA.personas.length){
+    toast('Primero agrega al menos una persona en "Personas".', 'err');
+    return;
+  }
   editingPagoId = null;
-  pagoContextPersonaId = personaId;
-  pagoContextMes = document.getElementById('pag-mes').value;
+  document.getElementById('pago-modal-title').textContent = 'Registrar nuevo pago';
+  llenarSelectoresPago(null, null);
+  document.getElementById('pago-persona').disabled = false;
+  document.getElementById('pago-mes-sel').disabled = false;
+  document.getElementById('pago-monto').value = DATA.config.monto_default || '200';
+  document.getElementById('pago-fecha').value = hoyISO();
+  abrir('ov-pago');
+  setTimeout(() => document.getElementById('pago-persona').focus(), 50);
+}
+
+function abrirMarcarPago(personaId, mes){
+  editingPagoId = null;
   document.getElementById('pago-modal-title').textContent = 'Marcar como pagado';
-  document.getElementById('pago-quien').innerHTML = `<b>${esc(per.nombre)}</b> · ${esc(mesLabel(pagoContextMes))}`;
+  llenarSelectoresPago(personaId, mes);
+  document.getElementById('pago-persona').disabled = false;
+  document.getElementById('pago-mes-sel').disabled = false;
   document.getElementById('pago-monto').value = DATA.config.monto_default || '200';
   document.getElementById('pago-fecha').value = hoyISO();
   abrir('ov-pago');
   setTimeout(() => document.getElementById('pago-monto').focus(), 50);
 }
+
 function abrirEditarPago(pagoId){
   const pg = DATA.pagos.find(p => p.id === pagoId);
   if (!pg) return;
   const per = DATA.personas.find(p => p.id === pg.personaId);
   editingPagoId = pagoId;
   document.getElementById('pago-modal-title').textContent = 'Editar pago';
-  document.getElementById('pago-quien').innerHTML = `<b>${esc(per ? per.nombre : pg.personaId)}</b> · ${esc(mesLabel(pg.mes))}`;
+  // En edición la persona y el mes no se cambian (son la "llave")
+  document.getElementById('pago-persona').innerHTML = `<option value="${pg.personaId}">${esc(per ? per.nombre : pg.personaId)}</option>`;
+  document.getElementById('pago-persona').disabled = true;
+  document.getElementById('pago-mes-sel').innerHTML = `<option value="${pg.mes}">${esc(mesLabel(pg.mes))}</option>`;
+  document.getElementById('pago-mes-sel').disabled = true;
   document.getElementById('pago-monto').value = pg.monto;
   document.getElementById('pago-fecha').value = pg.fechaPago || hoyISO();
   abrir('ov-pago');
+  setTimeout(() => document.getElementById('pago-monto').focus(), 50);
 }
+
 document.getElementById('pago-save').addEventListener('click', async function(){
+  const personaId = document.getElementById('pago-persona').value;
+  const mes = document.getElementById('pago-mes-sel').value;
   const monto = parseFloat(document.getElementById('pago-monto').value);
   const fechaPago = document.getElementById('pago-fecha').value;
+  if (!editingPagoId && !personaId){ toast('Elige una persona.', 'err'); return; }
+  if (!editingPagoId && !mes){ toast('Elige un mes.', 'err'); return; }
   if (isNaN(monto) || monto < 0){ toast('Monto inválido.', 'err'); return; }
-  this.disabled = true;
+  setLoading(this, true);
   try{
-    let res;
-    if (editingPagoId){
-      res = await api({ action:'editar_pago', token:S.token, id:editingPagoId, monto, fechaPago });
-    } else {
-      res = await api({ action:'registrar_pago', token:S.token, personaId:pagoContextPersonaId, mes:pagoContextMes, monto, fechaPago });
-    }
+    const res = editingPagoId
+      ? await api({ action:'editar_pago', token:S.token, id:editingPagoId, monto, fechaPago })
+      : await api({ action:'registrar_pago', token:S.token, personaId, mes, monto, fechaPago });
     if (!res.ok) throw new Error(res.error);
     toast(editingPagoId ? 'Pago actualizado.' : 'Pago registrado.', 'ok');
     cerrar('ov-pago');
     await refrescar();
     pintarPagosTabla();
   } catch(e){ toast(e.message, 'err'); }
-  finally{ this.disabled = false; }
+  finally{ setLoading(this, false); }
 });
-async function revertirPago(pagoId, nombre){
-  const ok = await confirmar({ titulo:'Revertir pago', msg:`¿Eliminar el pago de "${nombre}" en este mes?`, ok:'Sí, revertir', danger:true });
+
+async function revertirPago(pagoId, nombre, btn){
+  const ok = await confirmar({ titulo:'Revertir pago', msg:`¿Eliminar el pago de "${nombre}"?`, ok:'Sí, revertir', danger:true });
   if (!ok) return;
+  setLoading(btn, true);
   try{
     const res = await api({ action:'revertir_pago', token:S.token, id:pagoId });
     if (!res.ok) throw new Error(res.error);
     toast('Pago revertido.', 'ok');
     await refrescar();
     pintarPagosTabla();
-  } catch(e){ toast(e.message, 'err'); }
+  } catch(e){ toast(e.message, 'err'); setLoading(btn, false); }
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -1013,7 +1121,7 @@ function pintarGastos(){
     const acc = isAdmin
       ? `<div class="acts">
           <button class="btn btn-sm" onclick="abrirGasto('${g.id}')">✏ Editar</button>
-          <button class="btn btn-sm btn-danger" onclick="borrarGasto('${g.id}')">Borrar</button>
+          <button class="btn btn-sm btn-danger" onclick="borrarGasto('${g.id}', this)">Borrar</button>
         </div>`
       : '';
     return `<tr>
@@ -1050,7 +1158,7 @@ document.getElementById('gas-save').addEventListener('click', async function(){
   const fecha = document.getElementById('gas-fecha').value;
   if (!motivo){ toast('Escribe el motivo.', 'err'); return; }
   if (isNaN(monto) || monto <= 0){ toast('Monto inválido.', 'err'); return; }
-  this.disabled = true;
+  setLoading(this, true);
   try{
     const params = editingGastoId
       ? { action:'editar_gasto', token:S.token, id:editingGastoId, motivo, monto, fecha }
@@ -1062,19 +1170,20 @@ document.getElementById('gas-save').addEventListener('click', async function(){
     await refrescar();
     pintarGastos();
   } catch(e){ toast(e.message, 'err'); }
-  finally{ this.disabled = false; }
+  finally{ setLoading(this, false); }
 });
-async function borrarGasto(id){
+async function borrarGasto(id, btn){
   const g = DATA.gastos.find(x => x.id === id);
   const ok = await confirmar({ titulo:'Borrar gasto', msg:`¿Borrar el gasto "${(g&&g.motivo)||id}"? Volverá a sumarse al saldo.`, ok:'Sí, borrar', danger:true });
   if (!ok) return;
+  setLoading(btn, true);
   try{
     const res = await api({ action:'borrar_gasto', token:S.token, id });
     if (!res.ok) throw new Error(res.error);
     toast('Gasto borrado.', 'ok');
     await refrescar();
     pintarGastos();
-  } catch(e){ toast(e.message, 'err'); }
+  } catch(e){ toast(e.message, 'err'); setLoading(btn, false); }
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -1278,7 +1387,7 @@ function pintarUsuarios(){
       <td data-label="Creado">${esc(u.creadoEn)}</td>
       <td data-label="Acciones"><div class="acts">
         <button class="btn btn-sm" onclick="abrirUsuario('${esc(u.usuario)}')">✏ Editar</button>
-        ${u.usuario !== S.sesion.usuario ? `<button class="btn btn-sm btn-danger" onclick="borrarUsuario('${esc(u.usuario)}')">Borrar</button>` : ''}
+        ${u.usuario !== S.sesion.usuario ? `<button class="btn btn-sm btn-danger" onclick="borrarUsuario('${esc(u.usuario)}', this)">Borrar</button>` : ''}
       </div></td>
     </tr>`;
   }).join('');
@@ -1323,7 +1432,7 @@ document.getElementById('usu-save').addEventListener('click', async function(){
   const personaId = document.getElementById('usu-persona').value;
   if (!usuario || !nombre){ toast('Usuario y nombre son obligatorios.', 'err'); return; }
   if (!editingUsuario && !pass){ toast('La contraseña es obligatoria para nuevos usuarios.', 'err'); return; }
-  this.disabled = true;
+  setLoading(this, true);
   try{
     const params = editingUsuario
       ? { action:'editar_usuario', token:S.token, usuario, nombre, rol, activo, personaId }
@@ -1336,19 +1445,20 @@ document.getElementById('usu-save').addEventListener('click', async function(){
     await refrescar();
     pintarUsuarios();
   } catch(e){ toast(e.message, 'err'); }
-  finally{ this.disabled = false; }
+  finally{ setLoading(this, false); }
 });
 
-async function borrarUsuario(usuario){
+async function borrarUsuario(usuario, btn){
   const ok = await confirmar({ titulo:'Borrar usuario', msg:`¿Borrar el usuario "${usuario}"?`, ok:'Sí, borrar', danger:true });
   if (!ok) return;
+  setLoading(btn, true);
   try{
     const res = await api({ action:'borrar_usuario', token:S.token, usuario });
     if (!res.ok) throw new Error(res.error);
     toast('Usuario borrado.', 'ok');
     await refrescar();
     pintarUsuarios();
-  } catch(e){ toast(e.message, 'err'); }
+  } catch(e){ toast(e.message, 'err'); setLoading(btn, false); }
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -1365,7 +1475,7 @@ document.getElementById('cf-save').addEventListener('click', async function(){
   const inicio = document.getElementById('cf-inicio').value.trim();
   if (!/^\d{4}-\d{2}$/.test(inicio)){ toast('Mes de inicio inválido.', 'err'); return; }
   if (isNaN(parseFloat(monto)) || parseFloat(monto) < 0){ toast('Monto inválido.', 'err'); return; }
-  this.disabled = true;
+  setLoading(this, true);
   try{
     await api({ action:'set_config', token:S.token, llave:'nombre_grupo', valor:nombre });
     await api({ action:'set_config', token:S.token, llave:'monto_default', valor:monto });
@@ -1374,7 +1484,7 @@ document.getElementById('cf-save').addEventListener('click', async function(){
     await refrescar();
     pintarConfig();
   } catch(e){ toast(e.message, 'err'); }
-  finally{ this.disabled = false; }
+  finally{ setLoading(this, false); }
 });
 
 /* ════════════════════════════════════════════════════════════════
@@ -1384,14 +1494,14 @@ function abrirCambiarPass(){ document.getElementById('p-new').value = ''; abrir(
 document.getElementById('pass-save').addEventListener('click', async function(){
   const pass = document.getElementById('p-new').value;
   if (pass.length < 5){ toast('Mínimo 5 caracteres.', 'err'); return; }
-  this.disabled = true;
+  setLoading(this, true);
   try{
     const r = await api({ action:'cambiar_pass', token:S.token, pass });
     if (!r.ok) throw new Error(r.error);
     toast('Contraseña cambiada.', 'ok');
     cerrar('ov-pass');
   } catch(e){ toast(e.message, 'err'); }
-  finally{ this.disabled = false; }
+  finally{ setLoading(this, false); }
 });
 
 /* ════════════════════════════════════════════════════════════════
