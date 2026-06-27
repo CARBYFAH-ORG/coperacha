@@ -274,6 +274,19 @@
         <div class="tbl-wrap" id="tbl-pagos"></div>
       </section>
 
+      <!-- GASTOS -->
+      <section class="view" id="v-gastos">
+        <div class="sect-h">
+          <div class="sh-left">
+            <div class="page-title" id="gas-titulo">Gastos</div>
+            <div class="page-sub" id="gas-sub">Salidas del fondo: compras, materiales, etc. Se descuentan del total recaudado.</div>
+          </div>
+          <div class="sh-right" id="gas-acciones"></div>
+        </div>
+        <div class="cards" id="gas-cards"></div>
+        <div class="tbl-wrap" id="tbl-gastos"></div>
+      </section>
+
       <!-- REPORTES -->
       <section class="view" id="v-reportes">
         <div class="page-title">Reportes</div>
@@ -365,6 +378,21 @@
   </div>
 </div>
 
+<!-- MODAL GASTO -->
+<div class="overlay" id="ov-gasto">
+  <div class="modal">
+    <div class="modal-h"><h3 id="gas-modal-title">Nuevo gasto</h3><button class="modal-x" onclick="cerrar('ov-gasto')">&times;</button></div>
+    <div class="modal-b">
+      <div class="field"><label>Motivo *</label><input id="gas-motivo" autocomplete="off" placeholder="Ej. Café, azúcar y vasos para reunión del 15 jun"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div class="field"><label>Monto (L.) *</label><input id="gas-monto" type="number" min="0" step="0.01" inputmode="decimal"></div>
+        <div class="field"><label>Fecha *</label><input id="gas-fecha" type="date"></div>
+      </div>
+    </div>
+    <div class="modal-f"><button class="btn" onclick="cerrar('ov-gasto')">Cancelar</button><button class="btn btn-primary" id="gas-save">Guardar</button></div>
+  </div>
+</div>
+
 <!-- MODAL USUARIO -->
 <div class="overlay" id="ov-usuario">
   <div class="modal">
@@ -412,7 +440,7 @@
 /* ════════════════════════════════════════════════════════════════
    CONFIGURACIÓN
    ════════════════════════════════════════════════════════════════ */
-const API_URL = "https://script.google.com/macros/s/AKfycbwpiJ3l1GwU7yxClSUu8uNnPg3QUdINwx3dIdJwGSSyNjENi1BGJ5meMEDAfZf0RuGOpA/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzngXL4vC_SSAxU6JRNjzTOfXmEJzONb6wObHxrib4P5SyBxnmrl9jplSMskfxe0_7gaQ/exec";
 
 /* ════════════════════════════════════════════════════════════════
    ESTADO Y HELPERS
@@ -428,12 +456,13 @@ const store = {
 let S = { token: store.get('coop_token'), sesion: null };
 try { S.sesion = JSON.parse(store.get('coop_sesion') || 'null'); } catch(e){}
 
-let DATA = { config:{}, personas:[], pagos:[], usuarios:[] };
+let DATA = { config:{}, personas:[], pagos:[], gastos:[], usuarios:[] };
 let editingPersonaId = null;
 let editingPagoId = null;       // si está editando un pago existente
 let pagoContextPersonaId = null;
 let pagoContextMes = null;
 let editingUsuario = null;      // username en edición
+let editingGastoId = null;
 
 /* ──── HTTP ──── */
 async function api(params, method='POST'){
@@ -512,6 +541,7 @@ const NAV = {
     { v:'mi-estado', label:'Mi estado', svg:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>', conPersona:true },
     { v:'personas', label:'Personas', svg:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11h-6M19 8v6"/>' },
     { v:'pagos', label:'Pagos por mes', svg:'<rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="12" cy="12" r="3"/>' },
+    { v:'gastos', label:'Gastos', svg:'<path d="M3 6h18l-1.5 13.5a2 2 0 0 1-2 1.8h-11a2 2 0 0 1-2-1.8L3 6z"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>' },
     { v:'reportes', label:'Reportes', svg:'<path d="M4 4h12l4 4v12H4z"/><path d="M9 13l2 2 4-4"/>' },
     { v:'usuarios', label:'Usuarios', svg:'<rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>' },
     { v:'config', label:'Configuración', svg:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3 1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8 1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>' },
@@ -519,6 +549,7 @@ const NAV = {
   ],
   usuario: [
     { v:'mi-estado', label:'Mi estado', svg:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>' },
+    { v:'gastos', label:'Gastos del grupo', svg:'<path d="M3 6h18l-1.5 13.5a2 2 0 0 1-2 1.8h-11a2 2 0 0 1-2-1.8L3 6z"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>' },
     { v:'reportes', label:'Reportes', svg:'<path d="M4 4h12l4 4v12H4z"/><path d="M9 13l2 2 4-4"/>' },
     { v:'ayuda', label:'Ayuda', svg:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 4 1.8c0 1.7-2.5 2-2.5 3.2M12 17h.01"/>' }
   ]
@@ -558,13 +589,14 @@ function irA(v){
   document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
   const el = document.getElementById('v-' + v);
   if (el) el.classList.add('active');
-  const titulos = { dashboard:'Dashboard','mi-estado':'Mi estado', personas:'Personas', pagos:'Pagos por mes', reportes:'Reportes', usuarios:'Usuarios', config:'Configuración', ayuda:'Ayuda' };
+  const titulos = { dashboard:'Dashboard','mi-estado':'Mi estado', personas:'Personas', pagos:'Pagos por mes', gastos:'Gastos', reportes:'Reportes', usuarios:'Usuarios', config:'Configuración', ayuda:'Ayuda' };
   document.getElementById('tb-title').textContent = titulos[v] || '';
   document.getElementById('sidebar').classList.remove('open');
   if (v === 'dashboard')  pintarDashboard();
   if (v === 'mi-estado')  pintarMiEstado();
   if (v === 'personas')   pintarPersonas();
   if (v === 'pagos')      { pintarPagosMesSelect(); pintarPagosTabla(); }
+  if (v === 'gastos')     pintarGastos();
   if (v === 'reportes')   { pintarReportesFiltros(); pintarReportes(); }
   if (v === 'usuarios')   pintarUsuarios();
   if (v === 'config')     pintarConfig();
@@ -611,7 +643,7 @@ async function arrancar(){
   try{
     const res = await api({ action:'bootstrap', token:S.token });
     if (!res.ok) throw new Error(res.error);
-    DATA = { config:res.config, personas:res.personas, pagos:res.pagos, usuarios:res.usuarios };
+    DATA = { config:res.config, personas:res.personas, pagos:res.pagos, gastos:res.gastos||[], usuarios:res.usuarios };
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app').classList.add('show');
     reloj();
@@ -627,7 +659,7 @@ async function refrescar(){
   try{
     const res = await api({ action:'bootstrap', token:S.token });
     if (!res.ok) throw new Error(res.error);
-    DATA = { config:res.config, personas:res.personas, pagos:res.pagos, usuarios:res.usuarios };
+    DATA = { config:res.config, personas:res.personas, pagos:res.pagos, gastos:res.gastos||[], usuarios:res.usuarios };
   } catch(e){ toast(e.message,'err'); }
 }
 
@@ -642,14 +674,17 @@ function pintarDashboard(){
   const pagosTodos = DATA.pagos;
   const recaudadoMes = pagosMes.reduce((s,p) => s + (Number(p.monto)||0), 0);
   const recaudadoTotal = pagosTodos.reduce((s,p) => s + (Number(p.monto)||0), 0);
+  const totalGastos = (DATA.gastos||[]).reduce((s,g) => s + (Number(g.monto)||0), 0);
+  const saldo = recaudadoTotal - totalGastos;
   const pendientesMes = totalPersonas - pagosMes.length;
 
   const cards = [
     { n: totalPersonas, l:'Personas registradas', ic:'blue', svg:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>' },
     { n: pagosMes.length + '/' + totalPersonas, l:'Pagaron este mes', ic:'green', svg:'<path d="M20 6 9 17l-5-5"/>' },
     { n: pendientesMes, l:'Pendientes este mes', ic:'amber', svg:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>' },
-    { n: fmtL(recaudadoMes), l:'Recaudado este mes', ic:'slate', svg:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>' },
-    { n: fmtL(recaudadoTotal), l:'Recaudado total', ic:'slate', svg:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>' }
+    { n: fmtL(recaudadoTotal), l:'Total aportes', ic:'green', svg:'<path d="M12 19V5M5 12l7-7 7 7"/>' },
+    { n: fmtL(totalGastos), l:'Total gastos', ic:'red', svg:'<path d="M12 5v14M5 12l7 7 7-7"/>' },
+    { n: fmtL(saldo), l:'Saldo actual', ic: saldo >= 0 ? 'blue' : 'amber', svg:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>' }
   ];
   document.getElementById('dash-cards').innerHTML = cards.map(c =>
     `<div class="stat"><div class="ico ${c.ic}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${c.svg}</svg></div><div class="n">${c.n}</div><div class="l">${esc(c.l)}</div></div>`
@@ -942,6 +977,107 @@ async function revertirPago(pagoId, nombre){
 }
 
 /* ════════════════════════════════════════════════════════════════
+   GASTOS (admin: CRUD · usuario: solo lectura)
+   ════════════════════════════════════════════════════════════════ */
+function pintarGastos(){
+  const isAdmin = S.sesion.rol === 'admin';
+  const totalIngresos = DATA.pagos.reduce((s,p) => s + (Number(p.monto)||0), 0);
+  const totalGastos = (DATA.gastos||[]).reduce((s,g) => s + (Number(g.monto)||0), 0);
+  const saldo = totalIngresos - totalGastos;
+
+  // Título adaptado al rol
+  document.getElementById('gas-titulo').textContent = isAdmin ? 'Gastos' : 'Gastos del grupo';
+  document.getElementById('gas-sub').textContent = isAdmin
+    ? 'Salidas del fondo. Se descuentan del total recaudado.'
+    : 'Registro de gastos del fondo común. Visible para transparencia.';
+  document.getElementById('gas-acciones').innerHTML = isAdmin
+    ? '<button class="btn btn-primary" onclick="abrirGasto()">+ Nuevo gasto</button>'
+    : '';
+
+  const cards = [
+    { n: fmtL(totalIngresos), l:'Total aportes', ic:'green', svg:'<path d="M12 19V5M5 12l7-7 7 7"/>' },
+    { n: fmtL(totalGastos), l:'Total gastos', ic:'red', svg:'<path d="M12 5v14M5 12l7 7 7-7"/>' },
+    { n: fmtL(saldo), l:'Saldo actual', ic: saldo >= 0 ? 'blue' : 'amber', svg:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>' }
+  ];
+  document.getElementById('gas-cards').innerHTML = cards.map(c =>
+    `<div class="stat"><div class="ico ${c.ic}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${c.svg}</svg></div><div class="n">${c.n}</div><div class="l">${esc(c.l)}</div></div>`
+  ).join('');
+
+  const cont = document.getElementById('tbl-gastos');
+  if (!(DATA.gastos||[]).length){
+    cont.innerHTML = '<div class="tbl-empty">No hay gastos registrados todavía.</div>';
+    return;
+  }
+  const lista = DATA.gastos.slice().sort((a,b) => (b.fecha||'').localeCompare(a.fecha||''));
+  const filas = lista.map(g => {
+    const acc = isAdmin
+      ? `<div class="acts">
+          <button class="btn btn-sm" onclick="abrirGasto('${g.id}')">✏ Editar</button>
+          <button class="btn btn-sm btn-danger" onclick="borrarGasto('${g.id}')">Borrar</button>
+        </div>`
+      : '';
+    return `<tr>
+      <td data-label="Fecha"><span class="mono">${esc(g.fecha)}</span></td>
+      <td data-label="Motivo"><span class="nm">${esc(g.motivo)}</span></td>
+      <td data-label="Monto"><span class="money" style="color:var(--red-text)">- ${fmtL(g.monto)}</span></td>
+      <td data-label="Registrado por">${esc(g.registradoPor)}</td>
+      ${isAdmin ? `<td data-label="Acciones">${acc}</td>` : ''}
+    </tr>`;
+  }).join('');
+  cont.innerHTML = `<table><thead><tr><th>Fecha</th><th>Motivo</th><th>Monto</th><th>Registrado por</th>${isAdmin?'<th></th>':''}</tr></thead><tbody>${filas}</tbody></table>`;
+}
+
+function abrirGasto(id){
+  editingGastoId = id || null;
+  document.getElementById('gas-modal-title').textContent = id ? 'Editar gasto' : 'Nuevo gasto';
+  document.getElementById('gas-motivo').value = '';
+  document.getElementById('gas-monto').value = '';
+  document.getElementById('gas-fecha').value = hoyISO();
+  if (id){
+    const g = DATA.gastos.find(x => x.id === id);
+    if (g){
+      document.getElementById('gas-motivo').value = g.motivo;
+      document.getElementById('gas-monto').value = g.monto;
+      document.getElementById('gas-fecha').value = g.fecha || hoyISO();
+    }
+  }
+  abrir('ov-gasto');
+  setTimeout(() => document.getElementById('gas-motivo').focus(), 50);
+}
+document.getElementById('gas-save').addEventListener('click', async function(){
+  const motivo = document.getElementById('gas-motivo').value.trim();
+  const monto = parseFloat(document.getElementById('gas-monto').value);
+  const fecha = document.getElementById('gas-fecha').value;
+  if (!motivo){ toast('Escribe el motivo.', 'err'); return; }
+  if (isNaN(monto) || monto <= 0){ toast('Monto inválido.', 'err'); return; }
+  this.disabled = true;
+  try{
+    const params = editingGastoId
+      ? { action:'editar_gasto', token:S.token, id:editingGastoId, motivo, monto, fecha }
+      : { action:'crear_gasto',  token:S.token, motivo, monto, fecha };
+    const res = await api(params);
+    if (!res.ok) throw new Error(res.error);
+    toast(editingGastoId ? 'Gasto actualizado.' : 'Gasto registrado.', 'ok');
+    cerrar('ov-gasto');
+    await refrescar();
+    pintarGastos();
+  } catch(e){ toast(e.message, 'err'); }
+  finally{ this.disabled = false; }
+});
+async function borrarGasto(id){
+  const g = DATA.gastos.find(x => x.id === id);
+  const ok = await confirmar({ titulo:'Borrar gasto', msg:`¿Borrar el gasto "${(g&&g.motivo)||id}"? Volverá a sumarse al saldo.`, ok:'Sí, borrar', danger:true });
+  if (!ok) return;
+  try{
+    const res = await api({ action:'borrar_gasto', token:S.token, id });
+    if (!res.ok) throw new Error(res.error);
+    toast('Gasto borrado.', 'ok');
+    await refrescar();
+    pintarGastos();
+  } catch(e){ toast(e.message, 'err'); }
+}
+
+/* ════════════════════════════════════════════════════════════════
    REPORTES
    ════════════════════════════════════════════════════════════════ */
 function pintarReportesFiltros(){
@@ -1093,9 +1229,34 @@ function exportarExcel(){
   XLSX.utils.book_append_sheet(wb, ws1, 'Detalle');
   XLSX.utils.book_append_sheet(wb, ws2, 'Por mes');
   XLSX.utils.book_append_sheet(wb, ws3, 'Por persona');
+
+  // Hoja de Gastos
+  const gastosOrdenados = (DATA.gastos||[]).slice().sort((a,b) => (b.fecha||'').localeCompare(a.fecha||''));
+  const gastosFilas = gastosOrdenados.map(g => ({
+    'Fecha': g.fecha,
+    'Motivo': g.motivo,
+    'Monto': Number(g.monto)||0,
+    'Registrado por': g.registradoPor
+  }));
+  const ws4 = XLSX.utils.json_to_sheet(gastosFilas.length ? gastosFilas : [{'Fecha':'(sin gastos)','Motivo':'','Monto':0,'Registrado por':''}]);
+  ws4['!cols'] = [{wch:12},{wch:38},{wch:14},{wch:18}];
+  XLSX.utils.book_append_sheet(wb, ws4, 'Gastos');
+
+  // Hoja de Balance general
+  const totalIng = DATA.pagos.reduce((s,p) => s + (Number(p.monto)||0), 0);
+  const totalGas = (DATA.gastos||[]).reduce((s,g) => s + (Number(g.monto)||0), 0);
+  const balanceFilas = [
+    { 'Concepto': 'Total aportes (ingresos)', 'Monto (L.)': totalIng },
+    { 'Concepto': 'Total gastos (salidas)',   'Monto (L.)': -totalGas },
+    { 'Concepto': 'SALDO ACTUAL',             'Monto (L.)': totalIng - totalGas }
+  ];
+  const ws5 = XLSX.utils.json_to_sheet(balanceFilas);
+  ws5['!cols'] = [{wch:30},{wch:14}];
+  XLSX.utils.book_append_sheet(wb, ws5, 'Balance');
+
   const f = new Date();
   XLSX.writeFile(wb, 'Cooperacha_VIMASSS_' + f.getFullYear()+pad(f.getMonth()+1)+pad(f.getDate()) + '.xlsx');
-  toast('Excel generado (' + filas.length + ' registros).', 'ok');
+  toast('Excel generado (' + filas.length + ' registros + balance).', 'ok');
 }
 
 /* ════════════════════════════════════════════════════════════════
