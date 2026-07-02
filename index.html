@@ -173,9 +173,13 @@
 
   /* Items list in gasto modal */
   .items-list{margin-bottom:10px}
-  .item-row{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+  .item-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
   .item-row input:first-child{flex:1;min-width:0}
-  .item-row input:nth-child(2){width:110px}
+  .item-row input:nth-child(2){width:120px}
+  .item-row input{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px 13px;font-size:.94rem;color:var(--text);font-family:inherit}
+  .item-row input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+  .btn-add-item{width:100%;border:2px dashed var(--border);background:var(--soft);color:var(--primary);border-radius:10px;padding:11px;font-size:.9rem;font-weight:600;cursor:pointer;transition:.14s;margin-bottom:10px}
+  .btn-add-item:hover{border-color:var(--primary);background:var(--primary-soft)}
   .item-del{background:none;border:none;color:var(--red-text);font-size:1.2rem;padding:4px 6px;line-height:1;cursor:pointer;border-radius:6px}
   .item-del:hover{background:var(--red-soft)}
   .gas-total-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--soft);border:1px solid var(--border);border-radius:10px;margin-top:8px}
@@ -329,7 +333,7 @@
       <div class="field"><label>Motivo / descripción <span style="color:var(--text-soft);font-weight:400">(opcional)</span></label><input id="gas-motivo" autocomplete="off" placeholder="Ej. Compra para reunión del 15 jun"></div>
       <div style="margin-bottom:6px"><label style="font-size:.82rem;font-weight:500;color:var(--text-dim)">Artículos *</label></div>
       <div class="items-list" id="gas-items"></div>
-      <button class="btn btn-sm" type="button" onclick="agregarItemGasto()" style="margin-bottom:6px">+ Agregar artículo</button>
+      <button class="btn-add-item" type="button" onclick="agregarItemGasto()">+ Agregar artículo</button>
       <div class="gas-total-bar"><span class="lbl">Total</span><span class="val" id="gas-total">L. 0.00</span></div>
     </div>
     <div class="modal-f"><button class="btn" onclick="cerrar('ov-gasto')">Cancelar</button><button class="btn btn-primary" id="gas-save">Guardar</button></div>
