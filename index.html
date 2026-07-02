@@ -11,7 +11,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  
+
 <style>
   :root{
     --bg:#f1f5f9;--card:#fff;--soft:#f8fafc;--border:#e2e8f0;
@@ -100,15 +100,9 @@
   .btn-danger:hover{background:var(--red-soft)}
   .btn-sm{padding:6px 10px;font-size:.78rem;border-radius:8px}
 
-  /* Spinner para botones en carga */
   .btn.loading{position:relative;color:transparent!important;pointer-events:none;cursor:wait;opacity:1}
   .btn.loading svg{visibility:hidden}
-  .btn.loading::after{
-    content:"";position:absolute;left:50%;top:50%;
-    width:14px;height:14px;margin:-7px 0 0 -7px;
-    border:2px solid #465fff;border-right-color:transparent;
-    border-radius:50%;animation:spin .65s linear infinite
-  }
+  .btn.loading::after{content:"";position:absolute;left:50%;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border:2px solid #465fff;border-right-color:transparent;border-radius:50%;animation:spin .65s linear infinite}
   .btn-primary.loading::after{border-color:#fff;border-right-color:transparent}
   .btn-danger.loading::after{border-color:#b91c1c;border-right-color:transparent}
   .btn-sm.loading::after{width:11px;height:11px;margin:-5.5px 0 0 -5.5px;border-width:2px}
@@ -163,7 +157,6 @@
   .wa-btn:hover{background:#1ebe5a}
   .wa-btn svg{width:20px;height:20px}
 
-  /* LOGIN SCREEN — minimalista, mismo aire que el dashboard */
   #login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px}
   .login-card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);width:100%;max-width:400px;padding:36px 32px;animation:fade .35s ease}
   .login-card .lg-logo{width:54px;height:54px;border-radius:13px;background:var(--primary);display:grid;place-items:center;color:#fff;margin:0 auto 18px}
@@ -173,11 +166,26 @@
   .login-card .field{margin-bottom:14px}
   .login-card .btn-primary{width:100%;justify-content:center;padding:12px;font-size:.95rem}
 
-  /* SECTION HEADER (con acción a la derecha) */
   .sect-h{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
   .sect-h .page-title,.sect-h .page-sub{margin:0}
   .sect-h .sh-left{flex:1;min-width:200px}
   .sect-h .sh-right{display:flex;gap:8px;flex-wrap:wrap}
+
+  /* Items list in gasto modal */
+  .items-list{margin-bottom:10px}
+  .item-row{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+  .item-row input:first-child{flex:1;min-width:0}
+  .item-row input:nth-child(2){width:110px}
+  .item-del{background:none;border:none;color:var(--red-text);font-size:1.2rem;padding:4px 6px;line-height:1;cursor:pointer;border-radius:6px}
+  .item-del:hover{background:var(--red-soft)}
+  .gas-total-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--soft);border:1px solid var(--border);border-radius:10px;margin-top:8px}
+  .gas-total-bar .lbl{font-size:.85rem;color:var(--text-dim);font-weight:500}
+  .gas-total-bar .val{font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--text)}
+  /* Items detail in table */
+  .items-detail{margin-top:4px}
+  .items-detail .item-line{display:flex;justify-content:space-between;font-size:.8rem;color:var(--text-dim);padding:2px 0}
+  .items-detail .item-line .iname{flex:1}
+  .items-detail .item-line .iprice{font-family:'JetBrains Mono',monospace;white-space:nowrap}
 
   @media(max-width:880px){
     .sidebar{transform:translateX(-100%)}
@@ -205,25 +213,24 @@
     .acts .btn{flex:1;justify-content:center;min-width:90px}
   }
   @media(max-width:380px){.cards{grid-template-columns:1fr}}
-.select2-container--default .select2-selection--single{height:44px;border:1px solid var(--border);border-radius:10px;padding:6px 13px;font-size:.94rem;font-family:'Inter',sans-serif;background:var(--card);display:flex;align-items:center}
-.select2-container--default .select2-selection--single .select2-selection__arrow{top:9px;right:10px}
-.select2-container--default.select2-container--focus .select2-selection--single{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
-.select2-dropdown{border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow-md);font-family:'Inter',sans-serif;font-size:.9rem}
-.select2-results__option--highlighted[aria-selected]{background:var(--primary)!important}
-.select2-search--dropdown .select2-search__field{border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:.9rem}
-.select2-container{width:100%!important}
-.select2-container--default .select2-selection--single .select2-selection__rendered{padding:0;color:var(--text)}
-.select2-container--default .select2-selection--single .select2-selection__placeholder{color:var(--text-soft)}
+
+  .select2-container--default .select2-selection--single{height:44px;border:1px solid var(--border);border-radius:10px;padding:6px 13px;font-size:.94rem;font-family:'Inter',sans-serif;background:var(--card);display:flex;align-items:center}
+  .select2-container--default .select2-selection--single .select2-selection__arrow{top:9px;right:10px}
+  .select2-container--default.select2-container--focus .select2-selection--single{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+  .select2-dropdown{border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow-md);font-family:'Inter',sans-serif;font-size:.9rem}
+  .select2-results__option--highlighted[aria-selected]{background:var(--primary)!important}
+  .select2-search--dropdown .select2-search__field{border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:.9rem}
+  .select2-container{width:100%!important}
+  .select2-container--default .select2-selection--single .select2-selection__rendered{padding:0;color:var(--text)}
+  .select2-container--default .select2-selection--single .select2-selection__placeholder{color:var(--text-soft)}
 </style>
 </head>
 <body>
 
-<!-- PANTALLA DE LOGIN -->
+<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-card">
-    <div class="lg-logo">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9zM18.82 9 12 12.72 5.18 9 12 5.28zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73z"/></svg>
-    </div>
+    <div class="lg-logo"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9zM18.82 9 12 12.72 5.18 9 12 5.28zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73z"/></svg></div>
     <h1>Cooperacha VI MASSS</h1>
     <div class="lg-sub">Inicia sesión para continuar</div>
     <div class="field"><label>Usuario</label><input id="lg-user" autocomplete="username" placeholder="usuario"></div>
@@ -233,7 +240,7 @@
   </div>
 </div>
 
-<!-- APP PRINCIPAL -->
+<!-- APP -->
 <div id="app">
   <aside class="sidebar" id="sidebar">
     <div class="brand">
@@ -243,243 +250,106 @@
     <nav class="nav" id="nav"></nav>
     <div class="sfoot" id="sfoot"></div>
   </aside>
-
   <div class="main">
     <div class="topbar">
       <button class="menu-btn" id="menu-btn">☰</button>
       <h2 id="tb-title">Dashboard</h2>
       <div class="right"><span class="clock" id="clock">—</span></div>
     </div>
-
     <div class="content">
-
-      <!-- DASHBOARD (solo admin) -->
       <section class="view" id="v-dashboard">
-        <div class="page-title">Dashboard</div>
-        <div class="page-sub">Resumen general de la cooperacha.</div>
+        <div class="page-title">Dashboard</div><div class="page-sub">Resumen general de la cooperacha.</div>
         <div class="cards" id="dash-cards"></div>
-        <div class="panel">
-          <div class="panel-h"><h3 id="dash-mes-titulo">Estado del mes actual</h3></div>
-          <div class="panel-b" id="dash-mes"></div>
-        </div>
-        <div class="panel">
-          <div class="panel-h"><h3>Resumen por mes</h3></div>
-          <div class="panel-b" id="dash-meses"></div>
-        </div>
+        <div class="panel"><div class="panel-h"><h3 id="dash-mes-titulo">Estado del mes actual</h3></div><div class="panel-b" id="dash-mes"></div></div>
+        <div class="panel"><div class="panel-h"><h3>Resumen por mes</h3></div><div class="panel-b" id="dash-meses"></div></div>
       </section>
-
-      <!-- MI ESTADO -->
       <section class="view" id="v-mi-estado">
-        <div class="page-title" id="mi-titulo">Mi estado</div>
-        <div class="page-sub" id="mi-sub">Historial de tus aportes mes a mes.</div>
-        <div class="cards" id="mi-cards"></div>
-        <div class="tbl-wrap" id="mi-tabla"></div>
+        <div class="page-title" id="mi-titulo">Mi estado</div><div class="page-sub" id="mi-sub">Historial de tus aportes mes a mes.</div>
+        <div class="cards" id="mi-cards"></div><div class="tbl-wrap" id="mi-tabla"></div>
       </section>
-
-      <!-- PERSONAS (admin) -->
       <section class="view" id="v-personas">
-        <div class="sect-h">
-          <div class="sh-left">
-            <div class="page-title">Personas</div>
-            <div class="page-sub">Miembros de la maestría que aportan a la cooperacha.</div>
-          </div>
-          <div class="sh-right"><button class="btn btn-primary" onclick="abrirPersona()">+ Nueva persona</button></div>
-        </div>
+        <div class="sect-h"><div class="sh-left"><div class="page-title">Personas</div><div class="page-sub">Miembros de la maestría que aportan a la cooperacha.</div></div><div class="sh-right"><button class="btn btn-primary" onclick="abrirPersona()">+ Nueva persona</button></div></div>
         <div class="toolbar"><input type="search" id="per-busca" class="grow" placeholder="Buscar por nombre…"></div>
         <div class="tbl-wrap" id="tbl-personas"></div>
       </section>
-
-      <!-- PAGOS (admin) -->
       <section class="view" id="v-pagos">
-        <div class="sect-h">
-          <div class="sh-left">
-            <div class="page-title">Pagos</div>
-            <div class="page-sub">Registra pagos eligiendo persona y mes. Filtra abajo para ver por mes específico.</div>
-          </div>
-          <div class="sh-right"><button class="btn btn-primary" onclick="abrirNuevoPago()">+ Registrar pago</button></div>
-        </div>
-        <div class="toolbar">
-          <label style="font-size:.85rem;color:var(--text-dim);font-weight:500">Ver mes:</label>
-          <select id="pag-mes"></select>
-          <input type="search" id="pag-busca" class="grow" placeholder="Buscar persona…">
-        </div>
-        <div class="cards" id="pag-cards"></div>
-        <div class="tbl-wrap" id="tbl-pagos"></div>
+        <div class="sect-h"><div class="sh-left"><div class="page-title">Pagos</div><div class="page-sub">Registra pagos eligiendo persona y mes.</div></div><div class="sh-right"><button class="btn btn-primary" onclick="abrirNuevoPago()">+ Registrar pago</button></div></div>
+        <div class="toolbar"><label style="font-size:.85rem;color:var(--text-dim);font-weight:500">Ver mes:</label><select id="pag-mes"></select><input type="search" id="pag-busca" class="grow" placeholder="Buscar persona…"></div>
+        <div class="cards" id="pag-cards"></div><div class="tbl-wrap" id="tbl-pagos"></div>
       </section>
-
-      <!-- GASTOS -->
       <section class="view" id="v-gastos">
-        <div class="sect-h">
-          <div class="sh-left">
-            <div class="page-title" id="gas-titulo">Gastos</div>
-            <div class="page-sub" id="gas-sub">Salidas del fondo: compras, materiales, etc. Se descuentan del total recaudado.</div>
-          </div>
-          <div class="sh-right" id="gas-acciones"></div>
-        </div>
-        <div class="cards" id="gas-cards"></div>
-        <div class="tbl-wrap" id="tbl-gastos"></div>
+        <div class="sect-h"><div class="sh-left"><div class="page-title" id="gas-titulo">Gastos</div><div class="page-sub" id="gas-sub">Salidas del fondo: compras, materiales, etc.</div></div><div class="sh-right" id="gas-acciones"></div></div>
+        <div class="cards" id="gas-cards"></div><div class="tbl-wrap" id="tbl-gastos"></div>
       </section>
-
-      <!-- REPORTES -->
       <section class="view" id="v-reportes">
-        <div class="page-title">Reportes</div>
-        <div class="page-sub">Filtra por mes o por persona y exporta a Excel.</div>
-        <div class="toolbar">
-          <select id="rep-mes"><option value="">Todos los meses</option></select>
-          <select id="rep-persona"><option value="">Todas las personas</option></select>
-          <select id="rep-estado">
-            <option value="">Cualquier estado</option>
-            <option value="pago">Solo Pagó</option>
-            <option value="nopago">Solo No pagó</option>
-          </select>
-          <div style="flex:1"></div>
-          <button class="btn btn-primary" onclick="exportarExcel()">⬇ Exportar a Excel</button>
-        </div>
-        <div class="cards" id="rep-cards"></div>
-        <div class="tbl-wrap" id="tbl-reportes"></div>
+        <div class="page-title">Reportes</div><div class="page-sub">Filtra por mes o por persona y exporta a Excel.</div>
+        <div class="toolbar"><select id="rep-mes"><option value="">Todos los meses</option></select><select id="rep-persona"><option value="">Todas las personas</option></select><select id="rep-estado"><option value="">Cualquier estado</option><option value="pago">Solo Pagó</option><option value="nopago">Solo No pagó</option></select><div style="flex:1"></div><button class="btn btn-primary" onclick="exportarExcel()">⬇ Exportar a Excel</button></div>
+        <div class="cards" id="rep-cards"></div><div class="tbl-wrap" id="tbl-reportes"></div>
       </section>
-
-      <!-- USUARIOS (admin) -->
       <section class="view" id="v-usuarios">
-        <div class="sect-h">
-          <div class="sh-left">
-            <div class="page-title">Usuarios</div>
-            <div class="page-sub">Credenciales de acceso al sistema. El admin gestiona quién puede entrar.</div>
-          </div>
-          <div class="sh-right"><button class="btn btn-primary" onclick="abrirUsuario()">+ Nuevo usuario</button></div>
-        </div>
+        <div class="sect-h"><div class="sh-left"><div class="page-title">Usuarios</div><div class="page-sub">Credenciales de acceso al sistema.</div></div><div class="sh-right"><button class="btn btn-primary" onclick="abrirUsuario()">+ Nuevo usuario</button></div></div>
         <div class="tbl-wrap" id="tbl-usuarios"></div>
       </section>
-
-      <!-- CONFIGURACIÓN (admin) -->
       <section class="view" id="v-config">
-        <div class="page-title">Configuración</div>
-        <div class="page-sub">Parámetros generales del sistema. Los meses se generan desde el inicio hasta el fin.</div>
+        <div class="page-title">Configuración</div><div class="page-sub">Parámetros generales del sistema.</div>
         <div class="panel"><div class="panel-b">
           <div class="field"><label>Nombre del grupo</label><input id="cf-nombre"></div>
           <div class="field"><label>Monto por defecto (L.)</label><input id="cf-monto" type="number" min="0" step="0.01" inputmode="decimal"></div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-            <div class="field"><label>Mes de inicio</label><input id="cf-inicio" type="month"></div>
-            <div class="field"><label>Mes de fin</label><input id="cf-fin" type="month"></div>
-          </div>
-          <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:8px">
-            <button class="btn btn-primary" id="cf-save">Guardar cambios</button>
-          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px"><div class="field"><label>Mes de inicio</label><input id="cf-inicio" type="month"></div><div class="field"><label>Mes de fin</label><input id="cf-fin" type="month"></div></div>
+          <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:8px"><button class="btn btn-primary" id="cf-save">Guardar cambios</button></div>
         </div></div>
       </section>
-
-      <!-- AYUDA -->
       <section class="view" id="v-ayuda">
-        <div class="page-title">Ayuda y soporte</div>
-        <div class="page-sub">¿Tienes dudas, un problema técnico o una idea de mejora?</div>
+        <div class="page-title">Ayuda y soporte</div><div class="page-sub">¿Tienes dudas, un problema técnico o una idea de mejora?</div>
         <div class="panel"><div class="panel-b">
           <div class="info-txt"><p>Para <strong>ayuda</strong>, <strong>soporte técnico</strong> o <strong>ideas de mejora</strong>, comunícate con el <strong>Teniente de Comunicaciones Denis Geobany Carbajal Mejía</strong>.</p></div>
-          <a class="wa-btn" href="https://wa.me/50497734613?text=Hola,%20necesito%20ayuda%20con%20la%20Cooperacha%20VI%20MASSS" target="_blank" rel="noopener">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15l-1.4 5 5.1-1.3A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 20zm4.4-6c-.2-.1-1.4-.7-1.6-.8-.2-.1-.4-.1-.5.1l-.7.9c-.1.2-.3.2-.5.1a6.5 6.5 0 0 1-3.2-2.8c-.2-.4.2-.4.6-1.2.1-.2 0-.3 0-.5l-.7-1.7c-.2-.5-.4-.4-.5-.4h-.5a1 1 0 0 0-.7.3c-.3.3-.9.9-.9 2.1s.9 2.5 1 2.6c.1.2 1.8 2.8 4.4 3.9 1.6.7 2.2.7 3 .6.5-.1 1.4-.6 1.6-1.1.2-.6.2-1 .1-1.1z"/></svg>
-            WhatsApp · +504 9773-4613
-          </a>
+          <a class="wa-btn" href="https://wa.me/50497734613?text=Hola,%20necesito%20ayuda%20con%20la%20Cooperacha%20VI%20MASSS" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15l-1.4 5 5.1-1.3A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 20zm4.4-6c-.2-.1-1.4-.7-1.6-.8-.2-.1-.4-.1-.5.1l-.7.9c-.1.2-.3.2-.5.1a6.5 6.5 0 0 1-3.2-2.8c-.2-.4.2-.4.6-1.2.1-.2 0-.3 0-.5l-.7-1.7c-.2-.5-.4-.4-.5-.4h-.5a1 1 0 0 0-.7.3c-.3.3-.9.9-.9 2.1s.9 2.5 1 2.6c.1.2 1.8 2.8 4.4 3.9 1.6.7 2.2.7 3 .6.5-.1 1.4-.6 1.6-1.1.2-.6.2-1 .1-1.1z"/></svg>WhatsApp · +504 9773-4613</a>
         </div></div>
       </section>
-
     </div>
     <div class="footer">Cooperacha VI MASSS · Sistema de Control de Aportes</div>
   </div>
 </div>
 
 <!-- MODAL PERSONA -->
-<div class="overlay" id="ov-persona">
-  <div class="modal">
-    <div class="modal-h"><h3 id="per-modal-title">Nueva persona</h3><button class="modal-x" onclick="cerrar('ov-persona')">&times;</button></div>
-    <div class="modal-b">
-      <div class="field"><label>Nombre completo *</label><input id="per-nombre" autocomplete="off" placeholder="Ej. Juan Carlos Pérez López"></div>
-    </div>
-    <div class="modal-f"><button class="btn" onclick="cerrar('ov-persona')">Cancelar</button><button class="btn btn-primary" id="per-save">Guardar</button></div>
-  </div>
-</div>
+<div class="overlay" id="ov-persona"><div class="modal"><div class="modal-h"><h3 id="per-modal-title">Nueva persona</h3><button class="modal-x" onclick="cerrar('ov-persona')">&times;</button></div><div class="modal-b"><div class="field"><label>Nombre completo *</label><input id="per-nombre" autocomplete="off" placeholder="Ej. Juan Carlos Pérez López"></div></div><div class="modal-f"><button class="btn" onclick="cerrar('ov-persona')">Cancelar</button><button class="btn btn-primary" id="per-save">Guardar</button></div></div></div>
 
 <!-- MODAL PAGO -->
-<div class="overlay" id="ov-pago">
-  <div class="modal">
-    <div class="modal-h"><h3 id="pago-modal-title">Registrar pago</h3><button class="modal-x" onclick="cerrar('ov-pago')">&times;</button></div>
-    <div class="modal-b">
-      <div class="field"><label>Persona *</label><select id="pago-persona"></select></div>
-      <div class="field"><label>Mes *</label><select id="pago-mes-sel"></select></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-        <div class="field"><label>Monto (L.)</label><input id="pago-monto" type="number" min="0" step="0.01" inputmode="decimal"></div>
-        <div class="field"><label>Fecha de pago</label><input id="pago-fecha" type="date"></div>
-      </div>
-    </div>
-    <div class="modal-f"><button class="btn" onclick="cerrar('ov-pago')">Cancelar</button><button class="btn btn-primary" id="pago-save">Confirmar</button></div>
-  </div>
-</div>
+<div class="overlay" id="ov-pago"><div class="modal"><div class="modal-h"><h3 id="pago-modal-title">Registrar pago</h3><button class="modal-x" onclick="cerrar('ov-pago')">&times;</button></div><div class="modal-b"><div class="field"><label>Persona *</label><select id="pago-persona"></select></div><div class="field"><label>Mes *</label><select id="pago-mes-sel"></select></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:14px"><div class="field"><label>Monto (L.)</label><input id="pago-monto" type="number" min="0" step="0.01" inputmode="decimal"></div><div class="field"><label>Fecha de pago</label><input id="pago-fecha" type="date"></div></div></div><div class="modal-f"><button class="btn" onclick="cerrar('ov-pago')">Cancelar</button><button class="btn btn-primary" id="pago-save">Confirmar</button></div></div></div>
 
-<!-- MODAL GASTO -->
+<!-- MODAL GASTO (nuevo: con artículos) -->
 <div class="overlay" id="ov-gasto">
-  <div class="modal">
+  <div class="modal" style="max-width:540px">
     <div class="modal-h"><h3 id="gas-modal-title">Nuevo gasto</h3><button class="modal-x" onclick="cerrar('ov-gasto')">&times;</button></div>
     <div class="modal-b">
-      <div class="field"><label>Motivo *</label><input id="gas-motivo" autocomplete="off" placeholder="Ej. Café, azúcar y vasos para reunión del 15 jun"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-        <div class="field"><label>Monto (L.) *</label><input id="gas-monto" type="number" min="0" step="0.01" inputmode="decimal"></div>
+        <div class="field"><label>N.° factura / registro <span style="color:var(--text-soft);font-weight:400">(opcional)</span></label><input id="gas-numfac" autocomplete="off" placeholder="Ej. F-0012"></div>
         <div class="field"><label>Fecha *</label><input id="gas-fecha" type="date"></div>
       </div>
+      <div class="field"><label>Motivo / descripción <span style="color:var(--text-soft);font-weight:400">(opcional)</span></label><input id="gas-motivo" autocomplete="off" placeholder="Ej. Compra para reunión del 15 jun"></div>
+      <div style="margin-bottom:6px"><label style="font-size:.82rem;font-weight:500;color:var(--text-dim)">Artículos *</label></div>
+      <div class="items-list" id="gas-items"></div>
+      <button class="btn btn-sm" type="button" onclick="agregarItemGasto()" style="margin-bottom:6px">+ Agregar artículo</button>
+      <div class="gas-total-bar"><span class="lbl">Total</span><span class="val" id="gas-total">L. 0.00</span></div>
     </div>
     <div class="modal-f"><button class="btn" onclick="cerrar('ov-gasto')">Cancelar</button><button class="btn btn-primary" id="gas-save">Guardar</button></div>
   </div>
 </div>
 
 <!-- MODAL USUARIO -->
-<div class="overlay" id="ov-usuario">
-  <div class="modal">
-    <div class="modal-h"><h3 id="usu-modal-title">Nuevo usuario</h3><button class="modal-x" onclick="cerrar('ov-usuario')">&times;</button></div>
-    <div class="modal-b">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-        <div class="field"><label>Usuario *</label><input id="usu-user" autocomplete="off" placeholder="juan.perez"></div>
-        <div class="field"><label>Nombre a mostrar *</label><input id="usu-nombre" autocomplete="off" placeholder="Juan Pérez"></div>
-      </div>
-      <div class="field"><label id="usu-pass-lbl">Contraseña *</label><input id="usu-pass" type="text" autocomplete="off" placeholder="mínimo 5 caracteres"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-        <div class="field"><label>Rol *</label><select id="usu-rol"><option value="usuario">Usuario</option><option value="admin">Admin</option></select></div>
-        <div class="field"><label>Activo</label><select id="usu-activo"><option value="true">Sí</option><option value="false">No</option></select></div>
-      </div>
-      <div class="field"><label>Vincular con persona <span style="color:var(--text-soft);font-weight:400">(opcional, para "Mi estado")</span></label><select id="usu-persona"></select></div>
-    </div>
-    <div class="modal-f"><button class="btn" onclick="cerrar('ov-usuario')">Cancelar</button><button class="btn btn-primary" id="usu-save">Guardar</button></div>
-  </div>
-</div>
+<div class="overlay" id="ov-usuario"><div class="modal"><div class="modal-h"><h3 id="usu-modal-title">Nuevo usuario</h3><button class="modal-x" onclick="cerrar('ov-usuario')">&times;</button></div><div class="modal-b"><div style="display:grid;grid-template-columns:1fr 1fr;gap:14px"><div class="field"><label>Usuario *</label><input id="usu-user" autocomplete="off" placeholder="juan.perez"></div><div class="field"><label>Nombre a mostrar *</label><input id="usu-nombre" autocomplete="off" placeholder="Juan Pérez"></div></div><div class="field"><label id="usu-pass-lbl">Contraseña *</label><input id="usu-pass" type="text" autocomplete="off" placeholder="mínimo 5 caracteres"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:14px"><div class="field"><label>Rol *</label><select id="usu-rol"><option value="usuario">Usuario</option><option value="admin">Admin</option></select></div><div class="field"><label>Activo</label><select id="usu-activo"><option value="true">Sí</option><option value="false">No</option></select></div></div><div class="field"><label>Vincular con persona <span style="color:var(--text-soft);font-weight:400">(opcional)</span></label><select id="usu-persona"></select></div></div><div class="modal-f"><button class="btn" onclick="cerrar('ov-usuario')">Cancelar</button><button class="btn btn-primary" id="usu-save">Guardar</button></div></div></div>
 
-<!-- MODAL CAMBIAR PASS -->
-<div class="overlay" id="ov-pass">
-  <div class="modal">
-    <div class="modal-h"><h3>Cambiar mi contraseña</h3><button class="modal-x" onclick="cerrar('ov-pass')">&times;</button></div>
-    <div class="modal-b"><div class="field"><label>Nueva contraseña</label><input id="p-new" type="text" autocomplete="off" placeholder="mínimo 5 caracteres"></div></div>
-    <div class="modal-f"><button class="btn" onclick="cerrar('ov-pass')">Cancelar</button><button class="btn btn-primary" id="pass-save">Guardar</button></div>
-  </div>
-</div>
+<!-- MODAL PASS -->
+<div class="overlay" id="ov-pass"><div class="modal"><div class="modal-h"><h3>Cambiar mi contraseña</h3><button class="modal-x" onclick="cerrar('ov-pass')">&times;</button></div><div class="modal-b"><div class="field"><label>Nueva contraseña</label><input id="p-new" type="text" autocomplete="off" placeholder="mínimo 5 caracteres"></div></div><div class="modal-f"><button class="btn" onclick="cerrar('ov-pass')">Cancelar</button><button class="btn btn-primary" id="pass-save">Guardar</button></div></div></div>
 
 <!-- MODAL CONFIRMAR -->
-<div class="overlay" id="ov-confirm">
-  <div class="modal" style="max-width:420px">
-    <div class="modal-b" style="padding:26px 24px 10px">
-      <div class="cf-ic info" id="cf-icon"></div>
-      <h3 id="cf-title" style="font-size:1.15rem;font-weight:700;margin-bottom:8px">¿Confirmar?</h3>
-      <p id="cf-msg" style="color:var(--text-dim);font-size:.92rem;line-height:1.5"></p>
-    </div>
-    <div class="modal-f"><button class="btn" id="cf-cancel">Cancelar</button><button class="btn btn-primary" id="cf-ok">Confirmar</button></div>
-  </div>
-</div>
+<div class="overlay" id="ov-confirm"><div class="modal" style="max-width:420px"><div class="modal-b" style="padding:26px 24px 10px"><div class="cf-ic info" id="cf-icon"></div><h3 id="cf-title" style="font-size:1.15rem;font-weight:700;margin-bottom:8px">¿Confirmar?</h3><p id="cf-msg" style="color:var(--text-dim);font-size:.92rem;line-height:1.5"></p></div><div class="modal-f"><button class="btn" id="cf-cancel">Cancelar</button><button class="btn btn-primary" id="cf-ok">Confirmar</button></div></div></div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-/* ════════════════════════════════════════════════════════════════
-   CONFIGURACIÓN
-   ════════════════════════════════════════════════════════════════ */
-const API_URL = "https://script.google.com/macros/s/AKfycbwOS_CXmRtkq8qPW28GqCEbIZiyDx6FMQstdag5tglJUK1KkyIaijr9Rh2fO6VMj0x-XQ/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbyp1LuE1QlQrV31MsPtwGfcvfMIakqmG2wK8Swlm5h-YYGO2dnxeKNTwuxgHKJPvf0eQA/exec";
 
-/* ════════════════════════════════════════════════════════════════
-   ESTADO Y HELPERS
-   ════════════════════════════════════════════════════════════════ */
 const MESES_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const _mem = {};
 const store = {
@@ -487,1087 +357,298 @@ const store = {
   set: (k,v) => { try { localStorage.setItem(k,v); } catch(e) { _mem[k] = v; } },
   del: k => { try { localStorage.removeItem(k); } catch(e) { delete _mem[k]; } }
 };
-
 let S = { token: store.get('coop_token'), sesion: null };
 try { S.sesion = JSON.parse(store.get('coop_sesion') || 'null'); } catch(e){}
-
 let DATA = { config:{}, personas:[], pagos:[], gastos:[], usuarios:[] };
-let editingPersonaId = null;
-let editingPagoId = null;       // si está editando un pago existente
-let pagoContextPersonaId = null;
-let pagoContextMes = null;
-let editingUsuario = null;      // username en edición
-let editingGastoId = null;
+let editingPersonaId=null, editingPagoId=null, editingUsuario=null, editingGastoId=null;
 
-/* ──── HTTP ──── */
 async function api(params, method='POST'){
-  if (method === 'GET'){
-    const qs = Object.keys(params).map(k => encodeURIComponent(k)+'='+encodeURIComponent(params[k])).join('&');
-    const r = await fetch(API_URL + '?' + qs + '&t=' + Date.now(), { method:'GET', redirect:'follow' });
-    return chk(await r.json());
+  if (method==='GET'){
+    const qs=Object.keys(params).map(k=>encodeURIComponent(k)+'='+encodeURIComponent(params[k])).join('&');
+    const r=await fetch(API_URL+'?'+qs+'&t='+Date.now(),{method:'GET',redirect:'follow'});return chk(await r.json());
   }
-  const r = await fetch(API_URL, { method:'POST', body:new URLSearchParams(params), redirect:'follow' });
-  return chk(await r.json());
+  const r=await fetch(API_URL,{method:'POST',body:new URLSearchParams(params),redirect:'follow'});return chk(await r.json());
 }
-function chk(res){
-  if (res && res.authError){ salir(true); throw new Error('Sesión expirada'); }
-  return res;
-}
+function chk(res){if(res&&res.authError){salir(true);throw new Error('Sesión expirada');}return res;}
 
-/* ──── UI HELPERS ──── */
-function toast(msg, tipo){
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show' + (tipo ? ' ' + tipo : '');
-  clearTimeout(t._h);
-  t._h = setTimeout(() => t.classList.remove('show'), 3200);
-}
-function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-function fmtL(n){ return 'L. ' + (Number(n)||0).toLocaleString('en-US', { minimumFractionDigits:2, maximumFractionDigits:2 }); }
-function pad(n){ return String(n).padStart(2,'0'); }
-function mesLabel(yyyymm){
-  if (!yyyymm) return '';
-  const [y,m] = String(yyyymm).split('-');
-  const idx = parseInt(m,10) - 1;
-  if (idx<0||idx>11) return yyyymm;
-  return MESES_ES[idx] + ' ' + y;
-}
-function listarMeses(mesInicio, mesFin){
-  const now = new Date();
-  const yn = now.getFullYear(), mn = now.getMonth() + 1;
-  let yi, mi;
-  if (/^\d{4}-\d{2}$/.test(mesInicio||'')){
-    [yi, mi] = mesInicio.split('-').map(Number);
-  } else {
-    // Sin mes_inicio: empieza desde el mes actual
-    yi = yn; mi = mn;
-  }
-  let yf, mf;
-  if (/^\d{4}-\d{2}$/.test(mesFin||'')){
-    [yf, mf] = mesFin.split('-').map(Number);
-  } else {
-    // Sin mes_fin: hasta diciembre del año del inicio (o del actual si es mayor)
-    yf = Math.max(yi, yn);
-    mf = 12;
-  }
-  const out = [];
-  let y = yi, m = mi, safety = 120;
-  while ((y < yf || (y === yf && m <= mf)) && safety-- > 0){
-    out.push(y + '-' + pad(m));
-    m++;
-    if (m > 12){ m = 1; y++; }
-  }
+function toast(msg,tipo){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(tipo?' '+tipo:'');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),3200);}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function fmtL(n){return'L. '+(Number(n)||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function pad(n){return String(n).padStart(2,'0');}
+function mesLabel(yyyymm){if(!yyyymm)return'';const[y,m]=String(yyyymm).split('-');const idx=parseInt(m,10)-1;if(idx<0||idx>11)return yyyymm;return MESES_ES[idx]+' '+y;}
+function listarMeses(mesInicio,mesFin){
+  const now=new Date();const yn=now.getFullYear(),mn=now.getMonth()+1;
+  let yi,mi;if(/^\d{4}-\d{2}$/.test(mesInicio||'')){[yi,mi]=mesInicio.split('-').map(Number);}else{yi=yn;mi=mn;}
+  let yf,mf;if(/^\d{4}-\d{2}$/.test(mesFin||'')){[yf,mf]=mesFin.split('-').map(Number);}else{yf=Math.max(yi,yn);mf=12;}
+  const out=[];let y=yi,m=mi,safety=120;
+  while((y<yf||(y===yf&&m<=mf))&&safety-->0){out.push(y+'-'+pad(m));m++;if(m>12){m=1;y++;}}
   return out;
 }
-function mesActual(){
-  const d = new Date();
-  return d.getFullYear() + '-' + pad(d.getMonth()+1);
-}
-function hoyISO(){
-  const d = new Date();
-  return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
-}
-function reloj(){
-  const d = new Date();
-  let h = d.getHours();
-  const a = h<12 ? 'a.m.' : 'p.m.';
-  h = h%12 || 12;
-  document.getElementById('clock').textContent = pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear()+' '+h+':'+pad(d.getMinutes())+' '+a;
-}
-setInterval(reloj, 1000);
+function mesActual(){const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1);}
+function hoyISO(){const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function reloj(){const d=new Date();let h=d.getHours();const a=h<12?'a.m.':'p.m.';h=h%12||12;document.getElementById('clock').textContent=pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear()+' '+h+':'+pad(d.getMinutes())+' '+a;}
+setInterval(reloj,1000);
+function abrir(id){document.getElementById(id).classList.add('show');}
+function cerrar(id){document.getElementById(id).classList.remove('show');}
+function setLoading(btn,on){if(!btn)return;if(on){btn.classList.add('loading');btn.disabled=true;}else{btn.classList.remove('loading');btn.disabled=false;}}
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('show');}));
 
-function abrir(id){ document.getElementById(id).classList.add('show'); }
-function cerrar(id){ document.getElementById(id).classList.remove('show'); }
-function setLoading(btn, on){
-  if (!btn) return;
-  if (on){ btn.classList.add('loading'); btn.disabled = true; }
-  else { btn.classList.remove('loading'); btn.disabled = false; }
-}
-document.querySelectorAll('.overlay').forEach(o => o.addEventListener('click', e => {
-  if (e.target === o) o.classList.remove('show');
-}));
-
-/* ══════ NAVEGACIÓN Y ROLES ══════ */
-const NAV = {
-  admin: [
-    { v:'dashboard', label:'Dashboard', svg:'<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>' },
-    { v:'mi-estado', label:'Mi estado', svg:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>', conPersona:true },
-    { v:'personas', label:'Personas', svg:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11h-6M19 8v6"/>' },
-    { v:'pagos', label:'Pagos por mes', svg:'<rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="12" cy="12" r="3"/>' },
-    { v:'gastos', label:'Gastos', svg:'<path d="M3 6h18l-1.5 13.5a2 2 0 0 1-2 1.8h-11a2 2 0 0 1-2-1.8L3 6z"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>' },
-    { v:'reportes', label:'Reportes', svg:'<path d="M4 4h12l4 4v12H4z"/><path d="M9 13l2 2 4-4"/>' },
-    { v:'usuarios', label:'Usuarios', svg:'<rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>' },
-    { v:'config', label:'Configuración', svg:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3 1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8 1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>' },
-    { v:'ayuda', label:'Ayuda', svg:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 4 1.8c0 1.7-2.5 2-2.5 3.2M12 17h.01"/>' }
+/* NAV */
+const NAV={
+  admin:[
+    {v:'dashboard',label:'Dashboard',svg:'<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>'},
+    {v:'mi-estado',label:'Mi estado',svg:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',conPersona:true},
+    {v:'personas',label:'Personas',svg:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11h-6M19 8v6"/>'},
+    {v:'pagos',label:'Pagos por mes',svg:'<rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="12" cy="12" r="3"/>'},
+    {v:'gastos',label:'Gastos',svg:'<path d="M3 6h18l-1.5 13.5a2 2 0 0 1-2 1.8h-11a2 2 0 0 1-2-1.8L3 6z"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>'},
+    {v:'reportes',label:'Reportes',svg:'<path d="M4 4h12l4 4v12H4z"/><path d="M9 13l2 2 4-4"/>'},
+    {v:'usuarios',label:'Usuarios',svg:'<rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'},
+    {v:'config',label:'Configuración',svg:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3 1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8 1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>'},
+    {v:'ayuda',label:'Ayuda',svg:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 4 1.8c0 1.7-2.5 2-2.5 3.2M12 17h.01"/>'}
   ],
-  usuario: [
-    { v:'mi-estado', label:'Mi estado', svg:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>' },
-    { v:'gastos', label:'Gastos del grupo', svg:'<path d="M3 6h18l-1.5 13.5a2 2 0 0 1-2 1.8h-11a2 2 0 0 1-2-1.8L3 6z"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>' },
-    { v:'reportes', label:'Reportes', svg:'<path d="M4 4h12l4 4v12H4z"/><path d="M9 13l2 2 4-4"/>' },
-    { v:'ayuda', label:'Ayuda', svg:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 4 1.8c0 1.7-2.5 2-2.5 3.2M12 17h.01"/>' }
+  usuario:[
+    {v:'mi-estado',label:'Mi estado',svg:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>'},
+    {v:'gastos',label:'Gastos del grupo',svg:'<path d="M3 6h18l-1.5 13.5a2 2 0 0 1-2 1.8h-11a2 2 0 0 1-2-1.8L3 6z"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>'},
+    {v:'reportes',label:'Reportes',svg:'<path d="M4 4h12l4 4v12H4z"/><path d="M9 13l2 2 4-4"/>'},
+    {v:'ayuda',label:'Ayuda',svg:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 4 1.8c0 1.7-2.5 2-2.5 3.2M12 17h.01"/>'}
   ]
 };
-
 function pintarNav(){
-  if (!S.sesion) return;
-  const isAdmin = S.sesion.rol === 'admin';
-  const items = (isAdmin ? NAV.admin : NAV.usuario).filter(it => !it.conPersona || S.sesion.personaId);
-  const nav = document.getElementById('nav');
-  let html = '<div class="grp">Principal</div>';
-  items.forEach((it, i) => {
-    html += `<a data-view="${it.v}" ${i===0?'class="active"':''}>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${it.svg}</svg>
-      ${esc(it.label)}</a>`;
-  });
-  nav.innerHTML = html;
-  nav.querySelectorAll('a').forEach(a => a.addEventListener('click', e => {
-    e.preventDefault();
-    nav.querySelectorAll('a').forEach(x => x.classList.remove('active'));
-    a.classList.add('active');
-    irA(a.dataset.view);
-  }));
-  // Footer del sidebar
-  const f = document.getElementById('sfoot');
-  f.innerHTML = `
-    <div class="who">${esc(S.sesion.nombre)}</div>
-    <div class="rol">${esc(S.sesion.usuario)} <span class="rol-badge ${isAdmin?'admin':''}">${isAdmin?'Admin':'Usuario'}</span></div>
-    <button class="btn-logout" onclick="salir(false)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 12H3m12 0-4-4m4 4-4 4M9 4h7a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H9"/></svg>
-      Cerrar sesión
-    </button>
-    <button class="sb-link" onclick="abrirCambiarPass()">Cambiar mi contraseña</button>`;
+  if(!S.sesion)return;const isAdmin=S.sesion.rol==='admin';
+  const items=(isAdmin?NAV.admin:NAV.usuario).filter(it=>!it.conPersona||S.sesion.personaId);
+  const nav=document.getElementById('nav');let html='<div class="grp">Principal</div>';
+  items.forEach((it,i)=>{html+=`<a data-view="${it.v}" ${i===0?'class="active"':''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${it.svg}</svg>${esc(it.label)}</a>`;});
+  nav.innerHTML=html;
+  nav.querySelectorAll('a').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();nav.querySelectorAll('a').forEach(x=>x.classList.remove('active'));a.classList.add('active');irA(a.dataset.view);}));
+  document.getElementById('sfoot').innerHTML=`<div class="who">${esc(S.sesion.nombre)}</div><div class="rol">${esc(S.sesion.usuario)} <span class="rol-badge ${isAdmin?'admin':''}">${isAdmin?'Admin':'Usuario'}</span></div><button class="btn-logout" onclick="salir(false)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 12H3m12 0-4-4m4 4-4 4M9 4h7a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H9"/></svg>Cerrar sesión</button><button class="sb-link" onclick="abrirCambiarPass()">Cambiar mi contraseña</button>`;
 }
-
 function irA(v){
-  document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
-  const el = document.getElementById('v-' + v);
-  if (el) el.classList.add('active');
-  const titulos = { dashboard:'Dashboard','mi-estado':'Mi estado', personas:'Personas', pagos:'Pagos por mes', gastos:'Gastos', reportes:'Reportes', usuarios:'Usuarios', config:'Configuración', ayuda:'Ayuda' };
-  document.getElementById('tb-title').textContent = titulos[v] || '';
-  document.getElementById('sidebar').classList.remove('open');
-  if (v === 'dashboard')  pintarDashboard();
-  if (v === 'mi-estado')  pintarMiEstado();
-  if (v === 'personas')   pintarPersonas();
-  if (v === 'pagos')      { pintarPagosMesSelect(); pintarPagosTabla(); }
-  if (v === 'gastos')     pintarGastos();
-  if (v === 'reportes')   { pintarReportesFiltros(); pintarReportes(); }
-  if (v === 'usuarios')   pintarUsuarios();
-  if (v === 'config')     pintarConfig();
+  document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+  const el=document.getElementById('v-'+v);if(el)el.classList.add('active');
+  const t={dashboard:'Dashboard','mi-estado':'Mi estado',personas:'Personas',pagos:'Pagos por mes',gastos:'Gastos',reportes:'Reportes',usuarios:'Usuarios',config:'Configuración',ayuda:'Ayuda'};
+  document.getElementById('tb-title').textContent=t[v]||'';document.getElementById('sidebar').classList.remove('open');
+  if(v==='dashboard')pintarDashboard();if(v==='mi-estado')pintarMiEstado();if(v==='personas')pintarPersonas();
+  if(v==='pagos'){pintarPagosMesSelect();pintarPagosTabla();}if(v==='gastos')pintarGastos();
+  if(v==='reportes'){pintarReportesFiltros();pintarReportes();}if(v==='usuarios')pintarUsuarios();if(v==='config')pintarConfig();
 }
-document.getElementById('menu-btn').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
+document.getElementById('menu-btn').addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('open'));
 
-/* ══════ LOGIN ══════ */
-document.getElementById('lg-btn').addEventListener('click', entrar);
-document.getElementById('lg-pass').addEventListener('keydown', e => { if (e.key === 'Enter') entrar(); });
-document.getElementById('lg-user').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('lg-pass').focus(); });
-
+/* LOGIN */
+document.getElementById('lg-btn').addEventListener('click',entrar);
+document.getElementById('lg-pass').addEventListener('keydown',e=>{if(e.key==='Enter')entrar();});
+document.getElementById('lg-user').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('lg-pass').focus();});
 async function entrar(){
-  const usuario = document.getElementById('lg-user').value.trim();
-  const pass = document.getElementById('lg-pass').value;
-  const err = document.getElementById('lg-err');
-  err.classList.remove('show');
-  if (!usuario || !pass){ err.textContent='Escribe usuario y contraseña.'; err.classList.add('show'); return; }
-  const btn = document.getElementById('lg-btn');
-  setLoading(btn, true);
-  try{
-    const res = await api({ action:'login', usuario, pass });
-    if (!res.ok){ err.textContent = res.error || 'No se pudo iniciar sesión.'; err.classList.add('show'); return; }
-    S.token = res.token; S.sesion = res.sesion;
-    store.set('coop_token', S.token);
-    store.set('coop_sesion', JSON.stringify(S.sesion));
-    await arrancar();
-  } catch(e){ err.textContent = e.message; err.classList.add('show'); }
-  finally{ setLoading(btn, false); }
+  const usuario=document.getElementById('lg-user').value.trim(),pass=document.getElementById('lg-pass').value,err=document.getElementById('lg-err');
+  err.classList.remove('show');if(!usuario||!pass){err.textContent='Escribe usuario y contraseña.';err.classList.add('show');return;}
+  const btn=document.getElementById('lg-btn');setLoading(btn,true);
+  try{const res=await api({action:'login',usuario,pass});if(!res.ok){err.textContent=res.error||'No se pudo iniciar sesión.';err.classList.add('show');return;}
+    S.token=res.token;S.sesion=res.sesion;store.set('coop_token',S.token);store.set('coop_sesion',JSON.stringify(S.sesion));await arrancar();
+  }catch(e){err.textContent=e.message;err.classList.add('show');}finally{setLoading(btn,false);}
 }
+function salir(expirada){if(S.token){try{api({action:'logout',token:S.token});}catch(e){}}store.del('coop_token');store.del('coop_sesion');S={token:null,sesion:null};document.getElementById('app').classList.remove('show');document.getElementById('login-screen').style.display='flex';document.getElementById('lg-user').value='';document.getElementById('lg-pass').value='';if(expirada)setTimeout(()=>toast('La sesión expiró. Vuelve a entrar.','err'),100);}
+async function arrancar(){try{const res=await api({action:'bootstrap',token:S.token});if(!res.ok)throw new Error(res.error);DATA={config:res.config,personas:res.personas,pagos:res.pagos,gastos:res.gastos||[],usuarios:res.usuarios};document.getElementById('login-screen').style.display='none';document.getElementById('app').classList.add('show');reloj();pintarNav();irA(S.sesion.rol==='admin'?'dashboard':'mi-estado');}catch(e){toast(e.message,'err');salir(false);}}
+async function refrescar(){try{const res=await api({action:'bootstrap',token:S.token});if(!res.ok)throw new Error(res.error);DATA={config:res.config,personas:res.personas,pagos:res.pagos,gastos:res.gastos||[],usuarios:res.usuarios};}catch(e){toast(e.message,'err');}}
 
-function salir(expirada){
-  if (S.token){ try { api({ action:'logout', token:S.token }); } catch(e){} }
-  store.del('coop_token'); store.del('coop_sesion');
-  S = { token:null, sesion:null };
-  document.getElementById('app').classList.remove('show');
-  document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('lg-user').value = '';
-  document.getElementById('lg-pass').value = '';
-  if (expirada) setTimeout(() => toast('La sesión expiró. Vuelve a entrar.', 'err'), 100);
-}
-
-/* ══════ ARRANQUE ══════ */
-async function arrancar(){
-  try{
-    const res = await api({ action:'bootstrap', token:S.token });
-    if (!res.ok) throw new Error(res.error);
-    DATA = { config:res.config, personas:res.personas, pagos:res.pagos, gastos:res.gastos||[], usuarios:res.usuarios };
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app').classList.add('show');
-    reloj();
-    pintarNav();
-    irA(S.sesion.rol === 'admin' ? 'dashboard' : 'mi-estado');
-  } catch(e){
-    toast(e.message, 'err');
-    salir(false);
-  }
-}
-
-async function refrescar(){
-  try{
-    const res = await api({ action:'bootstrap', token:S.token });
-    if (!res.ok) throw new Error(res.error);
-    DATA = { config:res.config, personas:res.personas, pagos:res.pagos, gastos:res.gastos||[], usuarios:res.usuarios };
-  } catch(e){ toast(e.message,'err'); }
-}
-
-/* ════════════════════════════════════════════════════════════════
-   DASHBOARD
-   ════════════════════════════════════════════════════════════════ */
+/* DASHBOARD */
 function pintarDashboard(){
-  const mAct = mesActual();
-  const meses = listarMeses(DATA.config.mes_inicio, DATA.config.mes_fin);
-  const totalPersonas = DATA.personas.length;
-  const pagosMes = DATA.pagos.filter(p => p.mes === mAct);
-  const pagosTodos = DATA.pagos;
-  const recaudadoMes = pagosMes.reduce((s,p) => s + (Number(p.monto)||0), 0);
-  const recaudadoTotal = pagosTodos.reduce((s,p) => s + (Number(p.monto)||0), 0);
-  const totalGastos = (DATA.gastos||[]).reduce((s,g) => s + (Number(g.monto)||0), 0);
-  const saldo = recaudadoTotal - totalGastos;
-  const pendientesMes = totalPersonas - pagosMes.length;
-
-  const cards = [
-    { n: totalPersonas, l:'Personas registradas', ic:'blue', svg:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>' },
-    { n: pagosMes.length + '/' + totalPersonas, l:'Pagaron este mes', ic:'green', svg:'<path d="M20 6 9 17l-5-5"/>' },
-    { n: pendientesMes, l:'Pendientes este mes', ic:'amber', svg:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>' },
-    { n: fmtL(recaudadoTotal), l:'Total aportes', ic:'green', svg:'<path d="M12 19V5M5 12l7-7 7 7"/>' },
-    { n: fmtL(totalGastos), l:'Total gastos', ic:'red', svg:'<path d="M12 5v14M5 12l7 7 7-7"/>' },
-    { n: fmtL(saldo), l:'Saldo actual', ic: saldo >= 0 ? 'blue' : 'amber', svg:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>' }
-  ];
-  document.getElementById('dash-cards').innerHTML = cards.map(c =>
-    `<div class="stat"><div class="ico ${c.ic}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${c.svg}</svg></div><div class="n">${c.n}</div><div class="l">${esc(c.l)}</div></div>`
-  ).join('');
-
-  document.getElementById('dash-mes-titulo').textContent = 'Estado de ' + mesLabel(mAct);
-  const pagosMesMap = {}; pagosMes.forEach(p => { pagosMesMap[p.personaId] = p; });
-  if (!totalPersonas){
-    document.getElementById('dash-mes').innerHTML = '<div class="tbl-empty">Aún no hay personas registradas. Ve a "Personas" para agregarlas.</div>';
-  } else {
-    const filas = DATA.personas.slice().sort((a,b)=>a.nombre.localeCompare(b.nombre)).map(per => {
-      const pg = pagosMesMap[per.id];
-      return `<tr>
-        <td data-label="Persona"><span class="nm">${esc(per.nombre)}</span></td>
-        <td data-label="Estado">${pg ? '<span class="pill pago">Pagó</span>' : '<span class="pill nopago">No pagó</span>'}</td>
-        <td data-label="Monto"><span class="money">${pg ? fmtL(pg.monto) : '—'}</span></td>
-        <td data-label="Fecha">${pg ? esc(pg.fechaPago) : '—'}</td>
-      </tr>`;
-    }).join('');
-    document.getElementById('dash-mes').innerHTML = `<div class="tbl-wrap" style="box-shadow:none;border:1px solid var(--border)"><table><thead><tr><th>Persona</th><th>Estado</th><th>Monto</th><th>Fecha de pago</th></tr></thead><tbody>${filas}</tbody></table></div>`;
+  const mAct=mesActual(),meses=listarMeses(DATA.config.mes_inicio,DATA.config.mes_fin),tp=DATA.personas.length;
+  const pm=DATA.pagos.filter(p=>p.mes===mAct),rt=DATA.pagos.reduce((s,p)=>s+(Number(p.monto)||0),0),tg=(DATA.gastos||[]).reduce((s,g)=>s+(Number(g.monto)||0),0),saldo=rt-tg;
+  const cards=[{n:tp,l:'Personas registradas',ic:'blue',svg:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>'},{n:pm.length+'/'+tp,l:'Pagaron este mes',ic:'green',svg:'<path d="M20 6 9 17l-5-5"/>'},{n:tp-pm.length,l:'Pendientes este mes',ic:'amber',svg:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>'},{n:fmtL(rt),l:'Total aportes',ic:'green',svg:'<path d="M12 19V5M5 12l7-7 7 7"/>'},{n:fmtL(tg),l:'Total gastos',ic:'red',svg:'<path d="M12 5v14M5 12l7 7 7-7"/>'},{n:fmtL(saldo),l:'Saldo actual',ic:saldo>=0?'blue':'amber',svg:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>'}];
+  document.getElementById('dash-cards').innerHTML=cards.map(c=>`<div class="stat"><div class="ico ${c.ic}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${c.svg}</svg></div><div class="n">${c.n}</div><div class="l">${esc(c.l)}</div></div>`).join('');
+  document.getElementById('dash-mes-titulo').textContent='Estado de '+mesLabel(mAct);
+  const pmm={};pm.forEach(p=>{pmm[p.personaId]=p;});
+  if(!tp){document.getElementById('dash-mes').innerHTML='<div class="tbl-empty">Aún no hay personas registradas.</div>';}else{
+    const filas=DATA.personas.slice().sort((a,b)=>a.nombre.localeCompare(b.nombre)).map(per=>{const pg=pmm[per.id];return`<tr><td data-label="Persona"><span class="nm">${esc(per.nombre)}</span></td><td data-label="Estado">${pg?'<span class="pill pago">Pagó</span>':'<span class="pill nopago">No pagó</span>'}</td><td data-label="Monto"><span class="money">${pg?fmtL(pg.monto):'—'}</span></td><td data-label="Fecha">${pg?esc(pg.fechaPago):'—'}</td></tr>`;}).join('');
+    document.getElementById('dash-mes').innerHTML=`<div class="tbl-wrap" style="box-shadow:none;border:1px solid var(--border)"><table><thead><tr><th>Persona</th><th>Estado</th><th>Monto</th><th>Fecha de pago</th></tr></thead><tbody>${filas}</tbody></table></div>`;
   }
-
-  // Resumen por mes
-  if (!meses.length){
-    document.getElementById('dash-meses').innerHTML = '<div class="tbl-empty">Configura el "Mes de inicio" en Configuración para ver el resumen.</div>';
-  } else {
-    const filas = meses.slice().reverse().map(m => {
-      const ps = DATA.pagos.filter(p => p.mes === m);
-      const total = ps.reduce((s,p) => s + (Number(p.monto)||0), 0);
-      return `<tr>
-        <td data-label="Mes"><b>${esc(mesLabel(m))}</b></td>
-        <td data-label="Pagaron">${ps.length} / ${totalPersonas}</td>
-        <td data-label="Pendientes">${Math.max(0,totalPersonas - ps.length)}</td>
-        <td data-label="Recaudado"><span class="money">${fmtL(total)}</span></td>
-      </tr>`;
-    }).join('');
-    document.getElementById('dash-meses').innerHTML = `<div class="tbl-wrap" style="box-shadow:none;border:1px solid var(--border)"><table><thead><tr><th>Mes</th><th>Pagaron</th><th>Pendientes</th><th>Recaudado</th></tr></thead><tbody>${filas}</tbody></table></div>`;
+  if(!meses.length){document.getElementById('dash-meses').innerHTML='<div class="tbl-empty">Configura el "Mes de inicio" en Configuración.</div>';}else{
+    const filas=meses.slice().reverse().map(m=>{const ps=DATA.pagos.filter(p=>p.mes===m);const total=ps.reduce((s,p)=>s+(Number(p.monto)||0),0);return`<tr><td data-label="Mes"><b>${esc(mesLabel(m))}</b></td><td data-label="Pagaron">${ps.length} / ${tp}</td><td data-label="Pendientes">${Math.max(0,tp-ps.length)}</td><td data-label="Recaudado"><span class="money">${fmtL(total)}</span></td></tr>`;}).join('');
+    document.getElementById('dash-meses').innerHTML=`<div class="tbl-wrap" style="box-shadow:none;border:1px solid var(--border)"><table><thead><tr><th>Mes</th><th>Pagaron</th><th>Pendientes</th><th>Recaudado</th></tr></thead><tbody>${filas}</tbody></table></div>`;
   }
 }
 
-/* ════════════════════════════════════════════════════════════════
-   MI ESTADO
-   ════════════════════════════════════════════════════════════════ */
+/* MI ESTADO */
 function pintarMiEstado(){
-  const pid = S.sesion.personaId;
-  if (!pid){
-    document.getElementById('mi-titulo').textContent = 'Mi estado';
-    document.getElementById('mi-sub').textContent = 'Tu cuenta no está vinculada a ninguna persona.';
-    document.getElementById('mi-cards').innerHTML = '';
-    document.getElementById('mi-tabla').innerHTML = '<div class="tbl-empty">Pídele al administrador que vincule tu usuario con tu nombre en la lista de personas.</div>';
-    return;
-  }
-  const persona = DATA.personas.find(p => p.id === pid);
-  document.getElementById('mi-titulo').textContent = persona ? persona.nombre : 'Mi estado';
-  document.getElementById('mi-sub').textContent = 'Historial de tus aportes mes a mes.';
-
-  const meses = listarMeses(DATA.config.mes_inicio, DATA.config.mes_fin);
-  const misPagos = DATA.pagos.filter(p => p.personaId === pid);
-  const mapa = {}; misPagos.forEach(p => { mapa[p.mes] = p; });
-  const pagados = misPagos.length;
-  const pendientes = meses.length - pagados;
-  const aportado = misPagos.reduce((s,p) => s + (Number(p.monto)||0), 0);
-
-  const cards = [
-    { n: meses.length, l:'Meses activos', ic:'blue', svg:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>' },
-    { n: pagados, l:'Meses pagados', ic:'green', svg:'<path d="M20 6 9 17l-5-5"/>' },
-    { n: pendientes, l:'Meses pendientes', ic:'amber', svg:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>' },
-    { n: fmtL(aportado), l:'Total aportado', ic:'slate', svg:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>' }
-  ];
-  document.getElementById('mi-cards').innerHTML = cards.map(c =>
-    `<div class="stat"><div class="ico ${c.ic}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${c.svg}</svg></div><div class="n">${c.n}</div><div class="l">${esc(c.l)}</div></div>`
-  ).join('');
-
-  if (!meses.length){
-    document.getElementById('mi-tabla').innerHTML = '<div class="tbl-empty">El administrador aún no ha configurado el mes de inicio.</div>';
-    return;
-  }
-  const filas = meses.slice().reverse().map(m => {
-    const pg = mapa[m];
-    return `<tr>
-      <td data-label="Mes"><b>${esc(mesLabel(m))}</b></td>
-      <td data-label="Estado">${pg ? '<span class="pill pago">Pagó</span>' : '<span class="pill nopago">No pagó</span>'}</td>
-      <td data-label="Monto"><span class="money">${pg ? fmtL(pg.monto) : '—'}</span></td>
-      <td data-label="Fecha">${pg ? esc(pg.fechaPago) : '—'}</td>
-    </tr>`;
-  }).join('');
-  document.getElementById('mi-tabla').innerHTML = `<table><thead><tr><th>Mes</th><th>Estado</th><th>Monto</th><th>Fecha de pago</th></tr></thead><tbody>${filas}</tbody></table>`;
+  const pid=S.sesion.personaId;if(!pid){document.getElementById('mi-titulo').textContent='Mi estado';document.getElementById('mi-sub').textContent='Tu cuenta no está vinculada a ninguna persona.';document.getElementById('mi-cards').innerHTML='';document.getElementById('mi-tabla').innerHTML='<div class="tbl-empty">Pídele al administrador que vincule tu usuario.</div>';return;}
+  const persona=DATA.personas.find(p=>p.id===pid);document.getElementById('mi-titulo').textContent=persona?persona.nombre:'Mi estado';document.getElementById('mi-sub').textContent='Historial de tus aportes mes a mes.';
+  const meses=listarMeses(DATA.config.mes_inicio,DATA.config.mes_fin),mp=DATA.pagos.filter(p=>p.personaId===pid),mapa={};mp.forEach(p=>{mapa[p.mes]=p;});
+  const cards=[{n:meses.length,l:'Meses activos',ic:'blue',svg:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>'},{n:mp.length,l:'Meses pagados',ic:'green',svg:'<path d="M20 6 9 17l-5-5"/>'},{n:meses.length-mp.length,l:'Meses pendientes',ic:'amber',svg:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>'},{n:fmtL(mp.reduce((s,p)=>s+(Number(p.monto)||0),0)),l:'Total aportado',ic:'slate',svg:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>'}];
+  document.getElementById('mi-cards').innerHTML=cards.map(c=>`<div class="stat"><div class="ico ${c.ic}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${c.svg}</svg></div><div class="n">${c.n}</div><div class="l">${esc(c.l)}</div></div>`).join('');
+  if(!meses.length){document.getElementById('mi-tabla').innerHTML='<div class="tbl-empty">El administrador aún no ha configurado el mes de inicio.</div>';return;}
+  const filas=meses.slice().reverse().map(m=>{const pg=mapa[m];return`<tr><td data-label="Mes"><b>${esc(mesLabel(m))}</b></td><td data-label="Estado">${pg?'<span class="pill pago">Pagó</span>':'<span class="pill nopago">No pagó</span>'}</td><td data-label="Monto"><span class="money">${pg?fmtL(pg.monto):'—'}</span></td><td data-label="Fecha">${pg?esc(pg.fechaPago):'—'}</td></tr>`;}).join('');
+  document.getElementById('mi-tabla').innerHTML=`<table><thead><tr><th>Mes</th><th>Estado</th><th>Monto</th><th>Fecha de pago</th></tr></thead><tbody>${filas}</tbody></table>`;
 }
 
-/* ════════════════════════════════════════════════════════════════
-   PERSONAS (admin)
-   ════════════════════════════════════════════════════════════════ */
+/* PERSONAS */
 function pintarPersonas(){
-  const q = (document.getElementById('per-busca').value || '').toLowerCase();
-  let lista = DATA.personas.slice().sort((a,b) => a.nombre.localeCompare(b.nombre));
-  if (q) lista = lista.filter(p => p.nombre.toLowerCase().indexOf(q) !== -1);
-  const cont = document.getElementById('tbl-personas');
-  if (!lista.length){
-    cont.innerHTML = '<div class="tbl-empty">Sin personas registradas todavía.</div>';
-    return;
-  }
-  const filas = lista.map(p => {
-    const ps = DATA.pagos.filter(x => x.personaId === p.id);
-    const total = ps.reduce((s,x) => s + (Number(x.monto)||0), 0);
-    return `<tr>
-      <td data-label="Persona"><div class="nm">${esc(p.nombre)}</div><div class="mono">${esc(p.id)}</div></td>
-      <td data-label="Pagos">${ps.length}</td>
-      <td data-label="Total aportado"><span class="money">${fmtL(total)}</span></td>
-      <td data-label="Registrado">${esc(p.registradoEn)}</td>
-      <td data-label="Acciones"><div class="acts">
-        <button class="btn btn-sm" onclick="abrirPersona('${p.id}')">✏ Editar</button>
-        <button class="btn btn-sm btn-danger" onclick="borrarPersona('${p.id}', this)">Borrar</button>
-      </div></td>
-    </tr>`;
-  }).join('');
-  cont.innerHTML = `<table><thead><tr><th>Persona</th><th>Pagos</th><th>Total aportado</th><th>Registrado</th><th></th></tr></thead><tbody>${filas}</tbody></table>`;
+  const q=(document.getElementById('per-busca').value||'').toLowerCase();let lista=DATA.personas.slice().sort((a,b)=>a.nombre.localeCompare(b.nombre));if(q)lista=lista.filter(p=>p.nombre.toLowerCase().indexOf(q)!==-1);
+  const cont=document.getElementById('tbl-personas');if(!lista.length){cont.innerHTML='<div class="tbl-empty">Sin personas registradas.</div>';return;}
+  cont.innerHTML=`<table><thead><tr><th>Persona</th><th>Pagos</th><th>Total aportado</th><th>Registrado</th><th></th></tr></thead><tbody>${lista.map(p=>{const ps=DATA.pagos.filter(x=>x.personaId===p.id);return`<tr><td data-label="Persona"><div class="nm">${esc(p.nombre)}</div><div class="mono">${esc(p.id)}</div></td><td data-label="Pagos">${ps.length}</td><td data-label="Total"><span class="money">${fmtL(ps.reduce((s,x)=>s+(Number(x.monto)||0),0))}</span></td><td data-label="Registrado">${esc(p.registradoEn)}</td><td data-label="Acciones"><div class="acts"><button class="btn btn-sm" onclick="abrirPersona('${p.id}')">✏ Editar</button><button class="btn btn-sm btn-danger" onclick="borrarPersona('${p.id}',this)">Borrar</button></div></td></tr>`;}).join('')}</tbody></table>`;
 }
-document.getElementById('per-busca').addEventListener('input', pintarPersonas);
+document.getElementById('per-busca').addEventListener('input',pintarPersonas);
+function abrirPersona(id){editingPersonaId=id||null;document.getElementById('per-modal-title').textContent=id?'Editar persona':'Nueva persona';document.getElementById('per-nombre').value='';if(id){const p=DATA.personas.find(x=>x.id===id);if(p)document.getElementById('per-nombre').value=p.nombre;}abrir('ov-persona');setTimeout(()=>document.getElementById('per-nombre').focus(),50);}
+document.getElementById('per-save').addEventListener('click',async function(){const nombre=document.getElementById('per-nombre').value.trim();if(!nombre){toast('Escribe el nombre.','err');return;}setLoading(this,true);try{const res=await api(editingPersonaId?{action:'editar_persona',token:S.token,id:editingPersonaId,nombre}:{action:'crear_persona',token:S.token,nombre});if(!res.ok)throw new Error(res.error);toast(editingPersonaId?'Persona actualizada.':'Persona registrada.','ok');cerrar('ov-persona');await refrescar();pintarPersonas();}catch(e){toast(e.message,'err');}finally{setLoading(this,false);}});
+async function borrarPersona(id,btn){const p=DATA.personas.find(x=>x.id===id);const ok=await confirmar({titulo:'Borrar persona',msg:`¿Borrar a "${(p&&p.nombre)||id}"? Se eliminará junto con TODOS sus pagos.`,ok:'Sí, borrar',danger:true});if(!ok)return;setLoading(btn,true);try{const res=await api({action:'borrar_persona',token:S.token,id});if(!res.ok)throw new Error(res.error);toast('Persona borrada.','ok');await refrescar();pintarPersonas();}catch(e){toast(e.message,'err');setLoading(btn,false);}}
 
-function abrirPersona(id){
-  editingPersonaId = id || null;
-  document.getElementById('per-modal-title').textContent = id ? 'Editar persona' : 'Nueva persona';
-  document.getElementById('per-nombre').value = '';
-  if (id){
-    const p = DATA.personas.find(x => x.id === id);
-    if (p) document.getElementById('per-nombre').value = p.nombre;
-  }
-  abrir('ov-persona');
-  setTimeout(() => document.getElementById('per-nombre').focus(), 50);
-}
-document.getElementById('per-save').addEventListener('click', async function(){
-  const nombre = document.getElementById('per-nombre').value.trim();
-  if (!nombre){ toast('Escribe el nombre.', 'err'); return; }
-  setLoading(this, true);
-  try{
-    const params = editingPersonaId
-      ? { action:'editar_persona', token:S.token, id:editingPersonaId, nombre }
-      : { action:'crear_persona',  token:S.token, nombre };
-    const res = await api(params);
-    if (!res.ok) throw new Error(res.error);
-    toast(editingPersonaId ? 'Persona actualizada.' : 'Persona registrada.', 'ok');
-    cerrar('ov-persona');
-    await refrescar();
-    pintarPersonas();
-  } catch(e){ toast(e.message, 'err'); }
-  finally{ setLoading(this, false); }
-});
-
-async function borrarPersona(id, btn){
-  const p = DATA.personas.find(x => x.id === id);
-  const ok = await confirmar({
-    titulo: 'Borrar persona',
-    msg: `¿Borrar a "${(p&&p.nombre)||id}"? Se eliminará junto con TODOS sus pagos. Esta acción no se puede deshacer.`,
-    ok: 'Sí, borrar',
-    danger: true
-  });
-  if (!ok) return;
-  setLoading(btn, true);
-  try{
-    const res = await api({ action:'borrar_persona', token:S.token, id });
-    if (!res.ok) throw new Error(res.error);
-    toast('Persona borrada.', 'ok');
-    await refrescar();
-    pintarPersonas();
-  } catch(e){ toast(e.message, 'err'); setLoading(btn, false); }
-}
-
-/* ════════════════════════════════════════════════════════════════
-   PAGOS (admin) — botón único "+ Registrar pago" con selector de mes
-   ════════════════════════════════════════════════════════════════ */
-function pintarPagosMesSelect(){
-  const meses = listarMeses(DATA.config.mes_inicio, DATA.config.mes_fin);
-  const sel = document.getElementById('pag-mes');
-  const prev = sel.value;
-  sel.innerHTML = '<option value="">Todos los meses</option>' +
-    meses.slice().reverse().map(m => `<option value="${m}">${esc(mesLabel(m))}</option>`).join('');
-  if (prev !== undefined && (prev === '' || meses.indexOf(prev) >= 0)){
-    sel.value = prev;
-  } else {
-    const ma = mesActual();
-    sel.value = (meses.indexOf(ma) >= 0) ? ma : '';
-  }
-}
+/* PAGOS */
+function pintarPagosMesSelect(){const meses=listarMeses(DATA.config.mes_inicio,DATA.config.mes_fin);const sel=document.getElementById('pag-mes');const prev=sel.value;sel.innerHTML='<option value="">Todos los meses</option>'+meses.slice().reverse().map(m=>`<option value="${m}">${esc(mesLabel(m))}</option>`).join('');if(prev!==undefined&&(prev===''||meses.indexOf(prev)>=0)){sel.value=prev;}else{const ma=mesActual();sel.value=(meses.indexOf(ma)>=0)?ma:(meses.length?meses[meses.length-1]:'');}}
 function pintarPagosTabla(){
-  const mes = document.getElementById('pag-mes').value;
-  const q = (document.getElementById('pag-busca').value || '').toLowerCase();
-  const personas = DATA.personas.slice().sort((a,b) => a.nombre.localeCompare(b.nombre));
-  const cardsEl = document.getElementById('pag-cards');
-  const cont = document.getElementById('tbl-pagos');
-
-  if (!mes){
-    // Vista "Todos los meses" — lista de pagos registrados
-    let pagos = DATA.pagos.slice();
-    if (q){
-      pagos = pagos.filter(pg => {
-        const per = DATA.personas.find(x => x.id === pg.personaId);
-        return per && per.nombre.toLowerCase().indexOf(q) !== -1;
-      });
-    }
-    pagos.sort((a,b) => (b.mes||'').localeCompare(a.mes||'') || (b.fechaPago||'').localeCompare(a.fechaPago||''));
-    const total = pagos.reduce((s,p) => s + (Number(p.monto)||0), 0);
-    const cards = [
-      { n: pagos.length, l:'Pagos registrados', ic:'green', svg:'<path d="M20 6 9 17l-5-5"/>' },
-      { n: personas.length, l:'Personas registradas', ic:'blue', svg:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>' },
-      { n: fmtL(total), l:'Total recaudado', ic:'slate', svg:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>' }
-    ];
-    cardsEl.innerHTML = cards.map(c =>
-      `<div class="stat"><div class="ico ${c.ic}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${c.svg}</svg></div><div class="n">${c.n}</div><div class="l">${esc(c.l)}</div></div>`
-    ).join('');
-    if (!pagos.length){
-      cont.innerHTML = '<div class="tbl-empty">No hay pagos registrados todavía. Usa "+ Registrar pago" para comenzar.</div>';
-      return;
-    }
-    const filas = pagos.map(pg => {
-      const per = DATA.personas.find(p => p.id === pg.personaId);
-      const nombre = per ? per.nombre : pg.personaId;
-      return `<tr>
-        <td data-label="Persona"><span class="nm">${esc(nombre)}</span></td>
-        <td data-label="Mes">${esc(mesLabel(pg.mes))}</td>
-        <td data-label="Monto"><span class="money">${fmtL(pg.monto)}</span></td>
-        <td data-label="Fecha">${esc(pg.fechaPago)}</td>
-        <td data-label="Acciones"><div class="acts">
-          <button class="btn btn-sm" onclick="abrirEditarPago('${pg.id}')">✏ Editar</button>
-          <button class="btn btn-sm btn-danger" onclick="revertirPago('${pg.id}','${esc(nombre)}', this)">↺ Revertir</button>
-        </div></td>
-      </tr>`;
-    }).join('');
-    cont.innerHTML = `<table><thead><tr><th>Persona</th><th>Mes</th><th>Monto</th><th>Fecha de pago</th><th></th></tr></thead><tbody>${filas}</tbody></table>`;
-    return;
-  }
-
-  // Vista de un mes específico — matriz de personas
-  const lista = q ? personas.filter(p => p.nombre.toLowerCase().indexOf(q) !== -1) : personas;
-  const pagosMes = DATA.pagos.filter(p => p.mes === mes);
-  const mapa = {}; pagosMes.forEach(p => { mapa[p.personaId] = p; });
-  const recaudado = pagosMes.reduce((s,p) => s + (Number(p.monto)||0), 0);
-  const cards = [
-    { n: pagosMes.length + '/' + personas.length, l:'Pagaron', ic:'green', svg:'<path d="M20 6 9 17l-5-5"/>' },
-    { n: Math.max(0, personas.length - pagosMes.length), l:'Pendientes', ic:'amber', svg:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>' },
-    { n: fmtL(recaudado), l:'Recaudado', ic:'slate', svg:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>' }
-  ];
-  cardsEl.innerHTML = cards.map(c =>
-    `<div class="stat"><div class="ico ${c.ic}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${c.svg}</svg></div><div class="n">${c.n}</div><div class="l">${esc(c.l)}</div></div>`
-  ).join('');
-
-  if (!personas.length){
-    cont.innerHTML = '<div class="tbl-empty">No hay personas registradas. Ve a "Personas" para agregarlas.</div>';
-    return;
-  }
-  if (!lista.length){
-    cont.innerHTML = '<div class="tbl-empty">Sin resultados para tu búsqueda.</div>';
-    return;
-  }
-  const filas = lista.map(per => {
-    const pg = mapa[per.id];
-    const acc = pg
-      ? `<button class="btn btn-sm" onclick="abrirEditarPago('${pg.id}')">✏ Editar</button>
-         <button class="btn btn-sm btn-danger" onclick="revertirPago('${pg.id}','${esc(per.nombre)}', this)">↺ Revertir</button>`
-      : `<button class="btn btn-sm btn-primary" onclick="abrirMarcarPago('${per.id}','${mes}')">💲 Marcar pago</button>`;
-    return `<tr>
-      <td data-label="Persona"><span class="nm">${esc(per.nombre)}</span></td>
-      <td data-label="Estado">${pg ? '<span class="pill pago">Pagó</span>' : '<span class="pill nopago">No pagó</span>'}</td>
-      <td data-label="Monto"><span class="money">${pg ? fmtL(pg.monto) : '—'}</span></td>
-      <td data-label="Fecha">${pg ? esc(pg.fechaPago) : '—'}</td>
-      <td data-label="Acciones"><div class="acts">${acc}</div></td>
-    </tr>`;
-  }).join('');
-  cont.innerHTML = `<table><thead><tr><th>Persona</th><th>Estado</th><th>Monto</th><th>Fecha de pago</th><th></th></tr></thead><tbody>${filas}</tbody></table>`;
+  const mes=document.getElementById('pag-mes').value,q=(document.getElementById('pag-busca').value||'').toLowerCase(),personas=DATA.personas.slice().sort((a,b)=>a.nombre.localeCompare(b.nombre)),ce=document.getElementById('pag-cards'),cont=document.getElementById('tbl-pagos');
+  if(!mes){let pagos=DATA.pagos.slice();if(q)pagos=pagos.filter(pg=>{const per=DATA.personas.find(x=>x.id===pg.personaId);return per&&per.nombre.toLowerCase().indexOf(q)!==-1;});pagos.sort((a,b)=>(b.mes||'').localeCompare(a.mes||'')||(b.fechaPago||'').localeCompare(a.fechaPago||''));const total=pagos.reduce((s,p)=>s+(Number(p.monto)||0),0);
+    ce.innerHTML=[{n:pagos.length,l:'Pagos registrados',ic:'green',svg:'<path d="M20 6 9 17l-5-5"/>'},{n:personas.length,l:'Personas',ic:'blue',svg:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>'},{n:fmtL(total),l:'Total recaudado',ic:'slate',svg:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>'}].map(c=>`<div class="stat"><div class="ico ${c.ic}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${c.svg}</svg></div><div class="n">${c.n}</div><div class="l">${esc(c.l)}</div></div>`).join('');
+    if(!pagos.length){cont.innerHTML='<div class="tbl-empty">No hay pagos registrados.</div>';return;}
+    cont.innerHTML=`<table><thead><tr><th>Persona</th><th>Mes</th><th>Monto</th><th>Fecha</th><th></th></tr></thead><tbody>${pagos.map(pg=>{const per=DATA.personas.find(p=>p.id===pg.personaId);const nm=per?per.nombre:pg.personaId;return`<tr><td data-label="Persona"><span class="nm">${esc(nm)}</span></td><td data-label="Mes">${esc(mesLabel(pg.mes))}</td><td data-label="Monto"><span class="money">${fmtL(pg.monto)}</span></td><td data-label="Fecha">${esc(pg.fechaPago)}</td><td data-label="Acciones"><div class="acts"><button class="btn btn-sm" onclick="abrirEditarPago('${pg.id}')">✏</button><button class="btn btn-sm btn-danger" onclick="revertirPago('${pg.id}','${esc(nm)}',this)">↺</button></div></td></tr>`;}).join('')}</tbody></table>`;return;}
+  const lista=q?personas.filter(p=>p.nombre.toLowerCase().indexOf(q)!==-1):personas;const pm=DATA.pagos.filter(p=>p.mes===mes);const mapa={};pm.forEach(p=>{mapa[p.personaId]=p;});const rec=pm.reduce((s,p)=>s+(Number(p.monto)||0),0);
+  ce.innerHTML=[{n:pm.length+'/'+personas.length,l:'Pagaron',ic:'green',svg:'<path d="M20 6 9 17l-5-5"/>'},{n:Math.max(0,personas.length-pm.length),l:'Pendientes',ic:'amber',svg:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>'},{n:fmtL(rec),l:'Recaudado',ic:'slate',svg:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>'}].map(c=>`<div class="stat"><div class="ico ${c.ic}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${c.svg}</svg></div><div class="n">${c.n}</div><div class="l">${esc(c.l)}</div></div>`).join('');
+  if(!lista.length){cont.innerHTML='<div class="tbl-empty">Sin resultados.</div>';return;}
+  cont.innerHTML=`<table><thead><tr><th>Persona</th><th>Estado</th><th>Monto</th><th>Fecha</th><th></th></tr></thead><tbody>${lista.map(per=>{const pg=mapa[per.id];const acc=pg?`<button class="btn btn-sm" onclick="abrirEditarPago('${pg.id}')">✏</button><button class="btn btn-sm btn-danger" onclick="revertirPago('${pg.id}','${esc(per.nombre)}',this)">↺</button>`:`<button class="btn btn-sm btn-primary" onclick="abrirMarcarPago('${per.id}','${mes}')">💲 Marcar</button>`;return`<tr><td data-label="Persona"><span class="nm">${esc(per.nombre)}</span></td><td data-label="Estado">${pg?'<span class="pill pago">Pagó</span>':'<span class="pill nopago">No pagó</span>'}</td><td data-label="Monto"><span class="money">${pg?fmtL(pg.monto):'—'}</span></td><td data-label="Fecha">${pg?esc(pg.fechaPago):'—'}</td><td data-label="Acciones"><div class="acts">${acc}</div></td></tr>`;}).join('')}</tbody></table>`;
 }
-['pag-mes','pag-busca'].forEach(id => {
-  const el = document.getElementById(id);
-  el.addEventListener('change', pintarPagosTabla);
-  el.addEventListener('input',  pintarPagosTabla);
-});
+['pag-mes','pag-busca'].forEach(id=>{const el=document.getElementById(id);el.addEventListener('change',pintarPagosTabla);el.addEventListener('input',pintarPagosTabla);});
+function llenarSelectoresPago(pSel,mSel){const po=DATA.personas.slice().sort((a,b)=>a.nombre.localeCompare(b.nombre));document.getElementById('pago-persona').innerHTML=(pSel?'':'<option value="">— Elige persona —</option>')+po.map(p=>`<option value="${p.id}" ${pSel===p.id?'selected':''}>${esc(p.nombre)}</option>`).join('');const meses=listarMeses(DATA.config.mes_inicio,DATA.config.mes_fin);const mk=mesActual();const ms=mSel||(meses.indexOf(mk)>=0?mk:meses[meses.length-1]);document.getElementById('pago-mes-sel').innerHTML=meses.slice().reverse().map(m=>`<option value="${m}" ${ms===m?'selected':''}>${esc(mesLabel(m))}</option>`).join('');}
+function abrirNuevoPago(){if(!DATA.personas.length){toast('Primero agrega personas.','err');return;}editingPagoId=null;document.getElementById('pago-modal-title').textContent='Registrar nuevo pago';llenarSelectoresPago(null,null);document.getElementById('pago-persona').disabled=false;document.getElementById('pago-mes-sel').disabled=false;document.getElementById('pago-monto').value=DATA.config.monto_default||'200';document.getElementById('pago-fecha').value=hoyISO();abrir('ov-pago');$('#pago-persona').select2({dropdownParent:$('#ov-pago'),placeholder:'Buscar persona…',width:'100%'});setTimeout(()=>$('#pago-persona').select2('open'),100);}
+function abrirMarcarPago(personaId,mes){editingPagoId=null;document.getElementById('pago-modal-title').textContent='Marcar como pagado';llenarSelectoresPago(personaId,mes);document.getElementById('pago-persona').disabled=false;document.getElementById('pago-mes-sel').disabled=false;document.getElementById('pago-monto').value=DATA.config.monto_default||'200';document.getElementById('pago-fecha').value=hoyISO();abrir('ov-pago');if($.fn.select2&&$('#pago-persona').data('select2'))$('#pago-persona').select2('destroy');setTimeout(()=>document.getElementById('pago-monto').focus(),50);}
+function abrirEditarPago(pagoId){const pg=DATA.pagos.find(p=>p.id===pagoId);if(!pg)return;const per=DATA.personas.find(p=>p.id===pg.personaId);editingPagoId=pagoId;document.getElementById('pago-modal-title').textContent='Editar pago';document.getElementById('pago-persona').innerHTML=`<option value="${pg.personaId}">${esc(per?per.nombre:pg.personaId)}</option>`;document.getElementById('pago-persona').disabled=true;document.getElementById('pago-mes-sel').innerHTML=`<option value="${pg.mes}">${esc(mesLabel(pg.mes))}</option>`;document.getElementById('pago-mes-sel').disabled=true;document.getElementById('pago-monto').value=pg.monto;document.getElementById('pago-fecha').value=pg.fechaPago||hoyISO();abrir('ov-pago');if($.fn.select2&&$('#pago-persona').data('select2'))$('#pago-persona').select2('destroy');setTimeout(()=>document.getElementById('pago-monto').focus(),50);}
+document.getElementById('pago-save').addEventListener('click',async function(){const personaId=document.getElementById('pago-persona').value,mes=document.getElementById('pago-mes-sel').value,monto=parseFloat(document.getElementById('pago-monto').value),fechaPago=document.getElementById('pago-fecha').value;if(!editingPagoId&&!personaId){toast('Elige una persona.','err');return;}if(!editingPagoId&&!mes){toast('Elige un mes.','err');return;}if(isNaN(monto)||monto<0){toast('Monto inválido.','err');return;}setLoading(this,true);try{const res=editingPagoId?await api({action:'editar_pago',token:S.token,id:editingPagoId,monto,fechaPago}):await api({action:'registrar_pago',token:S.token,personaId,mes,monto,fechaPago});if(!res.ok)throw new Error(res.error);toast(editingPagoId?'Pago actualizado.':'Pago registrado.','ok');cerrar('ov-pago');await refrescar();pintarPagosTabla();}catch(e){toast(e.message,'err');}finally{setLoading(this,false);}});
+async function revertirPago(pagoId,nombre,btn){const ok=await confirmar({titulo:'Revertir pago',msg:`¿Eliminar el pago de "${nombre}"?`,ok:'Sí, revertir',danger:true});if(!ok)return;setLoading(btn,true);try{const res=await api({action:'revertir_pago',token:S.token,id:pagoId});if(!res.ok)throw new Error(res.error);toast('Pago revertido.','ok');await refrescar();pintarPagosTabla();}catch(e){toast(e.message,'err');setLoading(btn,false);}}
 
-function llenarSelectoresPago(personaSel, mesSel){
-  const personasOrdenadas = DATA.personas.slice().sort((a,b) => a.nombre.localeCompare(b.nombre));
-  document.getElementById('pago-persona').innerHTML =
-    (personaSel ? '' : '<option value="">— Elige persona —</option>') +
-    personasOrdenadas.map(p => `<option value="${p.id}" ${personaSel===p.id?'selected':''}>${esc(p.nombre)}</option>`).join('');
-  const meses = listarMeses(DATA.config.mes_inicio, DATA.config.mes_fin);
-  const mesActualKey = mesActual();
-  const mesParaSeleccionar = mesSel || (meses.indexOf(mesActualKey) >= 0 ? mesActualKey : meses[meses.length-1]);
-  document.getElementById('pago-mes-sel').innerHTML =
-    meses.slice().reverse().map(m => `<option value="${m}" ${mesParaSeleccionar===m?'selected':''}>${esc(mesLabel(m))}</option>`).join('');
-}
-
-function abrirNuevoPago(){
-  if (!DATA.personas.length){
-    toast('Primero agrega al menos una persona en "Personas".', 'err');
-    return;
-  }
-  editingPagoId = null;
-  document.getElementById('pago-modal-title').textContent = 'Registrar nuevo pago';
-  llenarSelectoresPago(null, null);
-  document.getElementById('pago-persona').disabled = false;
-  document.getElementById('pago-mes-sel').disabled = false;
-  document.getElementById('pago-monto').value = DATA.config.monto_default || '200';
-  document.getElementById('pago-fecha').value = hoyISO();
-  abrir('ov-pago');
-  $('#pago-persona').select2({ dropdownParent: $('#ov-pago'), placeholder:'Buscar persona…', width:'100%' });
-  setTimeout(() => document.getElementById('pago-monto').focus(), 50);
-}
-
-function abrirMarcarPago(personaId, mes){
-  editingPagoId = null;
-  document.getElementById('pago-modal-title').textContent = 'Marcar como pagado';
-  llenarSelectoresPago(personaId, mes);
-  document.getElementById('pago-persona').disabled = false;
-  document.getElementById('pago-mes-sel').disabled = false;
-  document.getElementById('pago-monto').value = DATA.config.monto_default || '200';
-  document.getElementById('pago-fecha').value = hoyISO();
-  abrir('ov-pago');
-  if ($.fn.select2 && $('#pago-persona').data('select2')) $('#pago-persona').select2('destroy');
-  setTimeout(() => document.getElementById('pago-monto').focus(), 50);
-}
-
-function abrirEditarPago(pagoId){
-  const pg = DATA.pagos.find(p => p.id === pagoId);
-  if (!pg) return;
-  const per = DATA.personas.find(p => p.id === pg.personaId);
-  editingPagoId = pagoId;
-  document.getElementById('pago-modal-title').textContent = 'Editar pago';
-  // En edición la persona y el mes no se cambian (son la "llave")
-  document.getElementById('pago-persona').innerHTML = `<option value="${pg.personaId}">${esc(per ? per.nombre : pg.personaId)}</option>`;
-  document.getElementById('pago-persona').disabled = true;
-  document.getElementById('pago-mes-sel').innerHTML = `<option value="${pg.mes}">${esc(mesLabel(pg.mes))}</option>`;
-  document.getElementById('pago-mes-sel').disabled = true;
-  document.getElementById('pago-monto').value = pg.monto;
-  document.getElementById('pago-fecha').value = pg.fechaPago || hoyISO();
-  abrir('ov-pago');
-  setTimeout(() => document.getElementById('pago-monto').focus(), 50);
-}
-
-document.getElementById('pago-save').addEventListener('click', async function(){
-  const personaId = document.getElementById('pago-persona').value;
-  const mes = document.getElementById('pago-mes-sel').value;
-  const monto = parseFloat(document.getElementById('pago-monto').value);
-  const fechaPago = document.getElementById('pago-fecha').value;
-  if (!editingPagoId && !personaId){ toast('Elige una persona.', 'err'); return; }
-  if (!editingPagoId && !mes){ toast('Elige un mes.', 'err'); return; }
-  if (isNaN(monto) || monto < 0){ toast('Monto inválido.', 'err'); return; }
-  setLoading(this, true);
-  try{
-    const res = editingPagoId
-      ? await api({ action:'editar_pago', token:S.token, id:editingPagoId, monto, fechaPago })
-      : await api({ action:'registrar_pago', token:S.token, personaId, mes, monto, fechaPago });
-    if (!res.ok) throw new Error(res.error);
-    toast(editingPagoId ? 'Pago actualizado.' : 'Pago registrado.', 'ok');
-    cerrar('ov-pago');
-    await refrescar();
-    pintarPagosTabla();
-  } catch(e){ toast(e.message, 'err'); }
-  finally{ setLoading(this, false); }
-});
-
-async function revertirPago(pagoId, nombre, btn){
-  const ok = await confirmar({ titulo:'Revertir pago', msg:`¿Eliminar el pago de "${nombre}"?`, ok:'Sí, revertir', danger:true });
-  if (!ok) return;
-  setLoading(btn, true);
-  try{
-    const res = await api({ action:'revertir_pago', token:S.token, id:pagoId });
-    if (!res.ok) throw new Error(res.error);
-    toast('Pago revertido.', 'ok');
-    await refrescar();
-    pintarPagosTabla();
-  } catch(e){ toast(e.message, 'err'); setLoading(btn, false); }
-}
-
-/* ════════════════════════════════════════════════════════════════
-   GASTOS (admin: CRUD · usuario: solo lectura)
-   ════════════════════════════════════════════════════════════════ */
+/* ════════ GASTOS ════════ */
 function pintarGastos(){
-  const isAdmin = S.sesion.rol === 'admin';
-  const totalIngresos = DATA.pagos.reduce((s,p) => s + (Number(p.monto)||0), 0);
-  const totalGastos = (DATA.gastos||[]).reduce((s,g) => s + (Number(g.monto)||0), 0);
-  const saldo = totalIngresos - totalGastos;
-
-  // Título adaptado al rol
-  document.getElementById('gas-titulo').textContent = isAdmin ? 'Gastos' : 'Gastos del grupo';
-  document.getElementById('gas-sub').textContent = isAdmin
-    ? 'Salidas del fondo. Se descuentan del total recaudado.'
-    : 'Registro de gastos del fondo común. Visible para transparencia.';
-  document.getElementById('gas-acciones').innerHTML = isAdmin
-    ? '<button class="btn btn-primary" onclick="abrirGasto()">+ Nuevo gasto</button>'
-    : '';
-
-  const cards = [
-    { n: fmtL(totalIngresos), l:'Total aportes', ic:'green', svg:'<path d="M12 19V5M5 12l7-7 7 7"/>' },
-    { n: fmtL(totalGastos), l:'Total gastos', ic:'red', svg:'<path d="M12 5v14M5 12l7 7 7-7"/>' },
-    { n: fmtL(saldo), l:'Saldo actual', ic: saldo >= 0 ? 'blue' : 'amber', svg:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>' }
-  ];
-  document.getElementById('gas-cards').innerHTML = cards.map(c =>
-    `<div class="stat"><div class="ico ${c.ic}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${c.svg}</svg></div><div class="n">${c.n}</div><div class="l">${esc(c.l)}</div></div>`
-  ).join('');
-
-  const cont = document.getElementById('tbl-gastos');
-  if (!(DATA.gastos||[]).length){
-    cont.innerHTML = '<div class="tbl-empty">No hay gastos registrados todavía.</div>';
-    return;
-  }
-  const lista = DATA.gastos.slice().sort((a,b) => (b.fecha||'').localeCompare(a.fecha||''));
-  const filas = lista.map(g => {
-    const acc = isAdmin
-      ? `<div class="acts">
-          <button class="btn btn-sm" onclick="abrirGasto('${g.id}')">✏ Editar</button>
-          <button class="btn btn-sm btn-danger" onclick="borrarGasto('${g.id}', this)">Borrar</button>
-        </div>`
-      : '';
-    return `<tr>
+  const isAdmin=S.sesion.rol==='admin';
+  const totalIng=DATA.pagos.reduce((s,p)=>s+(Number(p.monto)||0),0),totalGas=(DATA.gastos||[]).reduce((s,g)=>s+(Number(g.monto)||0),0),saldo=totalIng-totalGas;
+  document.getElementById('gas-titulo').textContent=isAdmin?'Gastos':'Gastos del grupo';
+  document.getElementById('gas-sub').textContent=isAdmin?'Salidas del fondo. Se descuentan del total recaudado.':'Registro de gastos del fondo común.';
+  document.getElementById('gas-acciones').innerHTML=isAdmin?'<button class="btn btn-primary" onclick="abrirGasto()">+ Nuevo gasto</button>':'';
+  const cards=[{n:fmtL(totalIng),l:'Total aportes',ic:'green',svg:'<path d="M12 19V5M5 12l7-7 7 7"/>'},{n:fmtL(totalGas),l:'Total gastos',ic:'red',svg:'<path d="M12 5v14M5 12l7 7 7-7"/>'},{n:fmtL(saldo),l:'Saldo actual',ic:saldo>=0?'blue':'amber',svg:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>'}];
+  document.getElementById('gas-cards').innerHTML=cards.map(c=>`<div class="stat"><div class="ico ${c.ic}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${c.svg}</svg></div><div class="n">${c.n}</div><div class="l">${esc(c.l)}</div></div>`).join('');
+  const cont=document.getElementById('tbl-gastos');
+  if(!(DATA.gastos||[]).length){cont.innerHTML='<div class="tbl-empty">No hay gastos registrados todavía.</div>';return;}
+  const lista=DATA.gastos.slice().sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''));
+  const filas=lista.map(g=>{
+    const items=(g.items||[]);
+    const itemsHtml=items.length?`<div class="items-detail">${items.map(it=>`<div class="item-line"><span class="iname">${esc(it.nombre)}</span><span class="iprice">${fmtL(it.precio)}</span></div>`).join('')}</div>`:'';
+    const facLabel=g.numFactura?`<div class="mono" style="margin-top:2px">Factura: ${esc(g.numFactura)}</div>`:'';
+    const acc=isAdmin?`<div class="acts"><button class="btn btn-sm" onclick="abrirGasto('${g.id}')">✏ Editar</button><button class="btn btn-sm btn-danger" onclick="borrarGasto('${g.id}',this)">Borrar</button></div>`:'';
+    return`<tr>
       <td data-label="Fecha"><span class="mono">${esc(g.fecha)}</span></td>
-      <td data-label="Motivo"><span class="nm">${esc(g.motivo)}</span></td>
+      <td data-label="Detalle"><span class="nm">${esc(g.motivo||'(sin descripción)')}</span>${facLabel}${itemsHtml}</td>
       <td data-label="Monto"><span class="money" style="color:var(--red-text)">- ${fmtL(g.monto)}</span></td>
       <td data-label="Registrado por">${esc(g.registradoPor)}</td>
-      ${isAdmin ? `<td data-label="Acciones">${acc}</td>` : ''}
+      ${isAdmin?`<td data-label="Acciones">${acc}</td>`:''}
     </tr>`;
   }).join('');
-  cont.innerHTML = `<table><thead><tr><th>Fecha</th><th>Motivo</th><th>Monto</th><th>Registrado por</th>${isAdmin?'<th></th>':''}</tr></thead><tbody>${filas}</tbody></table>`;
+  cont.innerHTML=`<table><thead><tr><th>Fecha</th><th>Detalle</th><th>Monto</th><th>Registrado por</th>${isAdmin?'<th></th>':''}</tr></thead><tbody>${filas}</tbody></table>`;
 }
+
+/* Items dinámicos del modal gasto */
+let gastoItems = [];
+function renderItemsGasto(){
+  const cont=document.getElementById('gas-items');
+  cont.innerHTML=gastoItems.map((it,i)=>`<div class="item-row">
+    <input type="text" placeholder="Artículo" value="${esc(it.nombre)}" onchange="gastoItems[${i}].nombre=this.value">
+    <input type="number" placeholder="Precio" min="0" step="0.01" inputmode="decimal" value="${it.precio||''}" onchange="gastoItems[${i}].precio=parseFloat(this.value)||0;actualizarTotalGasto()">
+    <button class="item-del" onclick="gastoItems.splice(${i},1);renderItemsGasto();actualizarTotalGasto()" title="Quitar">&times;</button>
+  </div>`).join('');
+}
+function agregarItemGasto(){gastoItems.push({nombre:'',precio:0});renderItemsGasto();const rows=document.querySelectorAll('#gas-items .item-row');if(rows.length)rows[rows.length-1].querySelector('input').focus();}
+function actualizarTotalGasto(){const total=gastoItems.reduce((s,it)=>s+(Number(it.precio)||0),0);document.getElementById('gas-total').textContent=fmtL(total);}
 
 function abrirGasto(id){
-  editingGastoId = id || null;
-  document.getElementById('gas-modal-title').textContent = id ? 'Editar gasto' : 'Nuevo gasto';
-  document.getElementById('gas-motivo').value = '';
-  document.getElementById('gas-monto').value = '';
-  document.getElementById('gas-fecha').value = hoyISO();
-  if (id){
-    const g = DATA.gastos.find(x => x.id === id);
-    if (g){
-      document.getElementById('gas-motivo').value = g.motivo;
-      document.getElementById('gas-monto').value = g.monto;
-      document.getElementById('gas-fecha').value = g.fecha || hoyISO();
+  editingGastoId=id||null;
+  document.getElementById('gas-modal-title').textContent=id?'Editar gasto':'Nuevo gasto';
+  document.getElementById('gas-numfac').value='';
+  document.getElementById('gas-motivo').value='';
+  document.getElementById('gas-fecha').value=hoyISO();
+  gastoItems=[{nombre:'',precio:0}];
+  if(id){
+    const g=DATA.gastos.find(x=>x.id===id);
+    if(g){
+      document.getElementById('gas-numfac').value=g.numFactura||'';
+      document.getElementById('gas-motivo').value=g.motivo||'';
+      document.getElementById('gas-fecha').value=g.fecha||hoyISO();
+      gastoItems=(g.items&&g.items.length)?g.items.map(it=>({nombre:it.nombre||'',precio:Number(it.precio)||0})):[{nombre:'',precio:0}];
     }
   }
+  renderItemsGasto();actualizarTotalGasto();
   abrir('ov-gasto');
-  setTimeout(() => document.getElementById('gas-motivo').focus(), 50);
+  setTimeout(()=>document.getElementById('gas-numfac').focus(),50);
 }
-document.getElementById('gas-save').addEventListener('click', async function(){
-  const motivo = document.getElementById('gas-motivo').value.trim();
-  const monto = parseFloat(document.getElementById('gas-monto').value);
-  const fecha = document.getElementById('gas-fecha').value;
-  if (!motivo){ toast('Escribe el motivo.', 'err'); return; }
-  if (isNaN(monto) || monto <= 0){ toast('Monto inválido.', 'err'); return; }
-  setLoading(this, true);
+document.getElementById('gas-save').addEventListener('click',async function(){
+  const motivo=document.getElementById('gas-motivo').value.trim();
+  const numFactura=document.getElementById('gas-numfac').value.trim();
+  const fecha=document.getElementById('gas-fecha').value;
+  // Limpiar items vacíos
+  const items=gastoItems.filter(it=>it.nombre.trim()||it.precio>0);
+  if(!items.length){toast('Agrega al menos un artículo con nombre o precio.','err');return;}
+  // Validar que cada item tenga nombre
+  for(let i=0;i<items.length;i++){if(!items[i].nombre.trim()){toast('El artículo #'+(i+1)+' no tiene nombre.','err');return;}}
+  const total=items.reduce((s,it)=>s+(Number(it.precio)||0),0);
+  if(total<=0){toast('El total debe ser mayor a 0.','err');return;}
+  setLoading(this,true);
   try{
-    const params = editingGastoId
-      ? { action:'editar_gasto', token:S.token, id:editingGastoId, motivo, monto, fecha }
-      : { action:'crear_gasto',  token:S.token, motivo, monto, fecha };
-    const res = await api(params);
-    if (!res.ok) throw new Error(res.error);
-    toast(editingGastoId ? 'Gasto actualizado.' : 'Gasto registrado.', 'ok');
-    cerrar('ov-gasto');
-    await refrescar();
-    pintarGastos();
-  } catch(e){ toast(e.message, 'err'); }
-  finally{ setLoading(this, false); }
+    const params=editingGastoId
+      ?{action:'editar_gasto',token:S.token,id:editingGastoId,motivo,numFactura,items:JSON.stringify(items),fecha}
+      :{action:'crear_gasto',token:S.token,motivo,numFactura,items:JSON.stringify(items),fecha};
+    const res=await api(params);if(!res.ok)throw new Error(res.error);
+    toast(editingGastoId?'Gasto actualizado.':'Gasto registrado.','ok');cerrar('ov-gasto');await refrescar();pintarGastos();
+  }catch(e){toast(e.message,'err');}finally{setLoading(this,false);}
 });
-async function borrarGasto(id, btn){
-  const g = DATA.gastos.find(x => x.id === id);
-  const ok = await confirmar({ titulo:'Borrar gasto', msg:`¿Borrar el gasto "${(g&&g.motivo)||id}"? Volverá a sumarse al saldo.`, ok:'Sí, borrar', danger:true });
-  if (!ok) return;
-  setLoading(btn, true);
-  try{
-    const res = await api({ action:'borrar_gasto', token:S.token, id });
-    if (!res.ok) throw new Error(res.error);
-    toast('Gasto borrado.', 'ok');
-    await refrescar();
-    pintarGastos();
-  } catch(e){ toast(e.message, 'err'); setLoading(btn, false); }
-}
+async function borrarGasto(id,btn){const g=DATA.gastos.find(x=>x.id===id);const ok=await confirmar({titulo:'Borrar gasto',msg:`¿Borrar el gasto "${(g&&g.motivo)||id}"?`,ok:'Sí, borrar',danger:true});if(!ok)return;setLoading(btn,true);try{const res=await api({action:'borrar_gasto',token:S.token,id});if(!res.ok)throw new Error(res.error);toast('Gasto borrado.','ok');await refrescar();pintarGastos();}catch(e){toast(e.message,'err');setLoading(btn,false);}}
 
-/* ════════════════════════════════════════════════════════════════
-   REPORTES
-   ════════════════════════════════════════════════════════════════ */
-function pintarReportesFiltros(){
-  const meses = listarMeses(DATA.config.mes_inicio, DATA.config.mes_fin);
-  const selMes = document.getElementById('rep-mes');
-  const selPer = document.getElementById('rep-persona');
-  const prevM = selMes.value, prevP = selPer.value;
-  selMes.innerHTML = '<option value="">Todos los meses</option>' + meses.slice().reverse().map(m => `<option value="${m}">${esc(mesLabel(m))}</option>`).join('');
-  selPer.innerHTML = '<option value="">Todas las personas</option>' + DATA.personas.slice().sort((a,b) => a.nombre.localeCompare(b.nombre)).map(p => `<option value="${p.id}">${esc(p.nombre)}</option>`).join('');
-  if (prevM) selMes.value = prevM;
-  if (prevP) selPer.value = prevP;
-}
-
-function calcularReporte(){
-  const mes = document.getElementById('rep-mes').value;
-  const personaId = document.getElementById('rep-persona').value;
-  const estado = document.getElementById('rep-estado').value;
-  const isUser = S.sesion.rol !== 'admin';
-  const filtroUserPid = isUser ? S.sesion.personaId : '';
-
-  const filas = [];
-  if (mes){
-    // Listar todas las personas con su estado para ese mes
-    let pers = DATA.personas;
-    if (personaId) pers = pers.filter(p => p.id === personaId);
-    if (filtroUserPid) pers = pers.filter(p => p.id === filtroUserPid);
-    pers = pers.slice().sort((a,b) => a.nombre.localeCompare(b.nombre));
-    pers.forEach(per => {
-      const pg = DATA.pagos.find(x => x.personaId === per.id && x.mes === mes);
-      const pago = pg ? 'pago' : 'nopago';
-      if (estado && estado !== pago) return;
-      filas.push({
-        personaId: per.id,
-        nombre: per.nombre,
-        mes: mes,
-        estado: pg ? 'Pagó' : 'No pagó',
-        monto: pg ? Number(pg.monto)||0 : 0,
-        fechaPago: pg ? pg.fechaPago : '',
-        registradoPor: pg ? pg.registradoPor : '',
-        pagoId: pg ? pg.id : ''
-      });
-    });
-  } else {
-    // Sin mes: listar los pagos registrados (lo más útil para histórico)
-    let pagos = DATA.pagos.slice();
-    if (personaId) pagos = pagos.filter(p => p.personaId === personaId);
-    if (filtroUserPid) pagos = pagos.filter(p => p.personaId === filtroUserPid);
-    if (estado === 'nopago') pagos = [];   // no aplica sin un mes específico
-    pagos.sort((a,b) => (b.mes||'').localeCompare(a.mes||'') || a.personaId.localeCompare(b.personaId));
-    pagos.forEach(pg => {
-      const per = DATA.personas.find(p => p.id === pg.personaId);
-      filas.push({
-        personaId: pg.personaId,
-        nombre: per ? per.nombre : pg.personaId,
-        mes: pg.mes,
-        estado: 'Pagó',
-        monto: Number(pg.monto)||0,
-        fechaPago: pg.fechaPago,
-        registradoPor: pg.registradoPor,
-        pagoId: pg.id
-      });
-    });
-  }
-  return filas;
-}
-
-function pintarReportes(){
-  const filas = calcularReporte();
-  const totalRegistros = filas.length;
-  const pagos = filas.filter(f => f.estado === 'Pagó');
-  const noPagos = filas.filter(f => f.estado === 'No pagó');
-  const monto = pagos.reduce((s,f) => s + (Number(f.monto)||0), 0);
-
-  const cards = [
-    { n: totalRegistros, l:'Registros', ic:'blue', svg:'<path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/>' },
-    { n: pagos.length, l:'Pagos', ic:'green', svg:'<path d="M20 6 9 17l-5-5"/>' },
-    { n: noPagos.length, l:'No pagaron', ic:'amber', svg:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>' },
-    { n: fmtL(monto), l:'Total recaudado (filtrado)', ic:'slate', svg:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>' }
-  ];
-  document.getElementById('rep-cards').innerHTML = cards.map(c =>
-    `<div class="stat"><div class="ico ${c.ic}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${c.svg}</svg></div><div class="n">${c.n}</div><div class="l">${esc(c.l)}</div></div>`
-  ).join('');
-
-  const cont = document.getElementById('tbl-reportes');
-  if (!filas.length){
-    cont.innerHTML = '<div class="tbl-empty">Sin registros que coincidan con los filtros.</div>';
-    return;
-  }
-  const tr = filas.map(f => `<tr>
-    <td data-label="Persona"><span class="nm">${esc(f.nombre)}</span></td>
-    <td data-label="Mes">${esc(mesLabel(f.mes))}</td>
-    <td data-label="Estado">${f.estado === 'Pagó' ? '<span class="pill pago">Pagó</span>' : '<span class="pill nopago">No pagó</span>'}</td>
-    <td data-label="Monto"><span class="money">${f.monto ? fmtL(f.monto) : '—'}</span></td>
-    <td data-label="Fecha">${esc(f.fechaPago || '—')}</td>
-    <td data-label="Registrado por">${esc(f.registradoPor || '—')}</td>
-  </tr>`).join('');
-  cont.innerHTML = `<table><thead><tr><th>Persona</th><th>Mes</th><th>Estado</th><th>Monto</th><th>Fecha</th><th>Registrado por</th></tr></thead><tbody>${tr}</tbody></table>`;
-}
-['rep-mes','rep-persona','rep-estado'].forEach(id => {
-  const el = document.getElementById(id);
-  el.addEventListener('change', pintarReportes);
-});
+/* REPORTES */
+function pintarReportesFiltros(){const meses=listarMeses(DATA.config.mes_inicio,DATA.config.mes_fin);const sM=document.getElementById('rep-mes'),sP=document.getElementById('rep-persona');const pM=sM.value,pP=sP.value;sM.innerHTML='<option value="">Todos los meses</option>'+meses.slice().reverse().map(m=>`<option value="${m}">${esc(mesLabel(m))}</option>`).join('');sP.innerHTML='<option value="">Todas las personas</option>'+DATA.personas.slice().sort((a,b)=>a.nombre.localeCompare(b.nombre)).map(p=>`<option value="${p.id}">${esc(p.nombre)}</option>`).join('');if(pM)sM.value=pM;if(pP)sP.value=pP;}
+function calcularReporte(){const mes=document.getElementById('rep-mes').value,personaId=document.getElementById('rep-persona').value,estado=document.getElementById('rep-estado').value,isUser=S.sesion.rol!=='admin',fp=isUser?S.sesion.personaId:'';const filas=[];
+  if(mes){let pers=DATA.personas;if(personaId)pers=pers.filter(p=>p.id===personaId);if(fp)pers=pers.filter(p=>p.id===fp);pers=pers.slice().sort((a,b)=>a.nombre.localeCompare(b.nombre));pers.forEach(per=>{const pg=DATA.pagos.find(x=>x.personaId===per.id&&x.mes===mes);const pago=pg?'pago':'nopago';if(estado&&estado!==pago)return;filas.push({personaId:per.id,nombre:per.nombre,mes,estado:pg?'Pagó':'No pagó',monto:pg?Number(pg.monto)||0:0,fechaPago:pg?pg.fechaPago:'',registradoPor:pg?pg.registradoPor:'',pagoId:pg?pg.id:''});});}
+  else{let pagos=DATA.pagos.slice();if(personaId)pagos=pagos.filter(p=>p.personaId===personaId);if(fp)pagos=pagos.filter(p=>p.personaId===fp);if(estado==='nopago')pagos=[];pagos.sort((a,b)=>(b.mes||'').localeCompare(a.mes||'')||a.personaId.localeCompare(b.personaId));pagos.forEach(pg=>{const per=DATA.personas.find(p=>p.id===pg.personaId);filas.push({personaId:pg.personaId,nombre:per?per.nombre:pg.personaId,mes:pg.mes,estado:'Pagó',monto:Number(pg.monto)||0,fechaPago:pg.fechaPago,registradoPor:pg.registradoPor,pagoId:pg.id});});}
+  return filas;}
+function pintarReportes(){const filas=calcularReporte(),pagos=filas.filter(f=>f.estado==='Pagó'),noPagos=filas.filter(f=>f.estado==='No pagó'),monto=pagos.reduce((s,f)=>s+(Number(f.monto)||0),0);
+  document.getElementById('rep-cards').innerHTML=[{n:filas.length,l:'Registros',ic:'blue',svg:'<path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/>'},{n:pagos.length,l:'Pagos',ic:'green',svg:'<path d="M20 6 9 17l-5-5"/>'},{n:noPagos.length,l:'No pagaron',ic:'amber',svg:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>'},{n:fmtL(monto),l:'Total recaudado (filtrado)',ic:'slate',svg:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>'}].map(c=>`<div class="stat"><div class="ico ${c.ic}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${c.svg}</svg></div><div class="n">${c.n}</div><div class="l">${esc(c.l)}</div></div>`).join('');
+  const cont=document.getElementById('tbl-reportes');if(!filas.length){cont.innerHTML='<div class="tbl-empty">Sin registros que coincidan.</div>';return;}
+  cont.innerHTML=`<table><thead><tr><th>Persona</th><th>Mes</th><th>Estado</th><th>Monto</th><th>Fecha</th><th>Registrado por</th></tr></thead><tbody>${filas.map(f=>`<tr><td data-label="Persona"><span class="nm">${esc(f.nombre)}</span></td><td data-label="Mes">${esc(mesLabel(f.mes))}</td><td data-label="Estado">${f.estado==='Pagó'?'<span class="pill pago">Pagó</span>':'<span class="pill nopago">No pagó</span>'}</td><td data-label="Monto"><span class="money">${f.monto?fmtL(f.monto):'—'}</span></td><td data-label="Fecha">${esc(f.fechaPago||'—')}</td><td data-label="Registrado">${esc(f.registradoPor||'—')}</td></tr>`).join('')}</tbody></table>`;}
+['rep-mes','rep-persona','rep-estado'].forEach(id=>document.getElementById(id).addEventListener('change',pintarReportes));
 
 function exportarExcel(){
-  if (typeof XLSX === 'undefined'){ toast('No se pudo cargar el exportador.', 'err'); return; }
-  const filas = calcularReporte();
-  if (!filas.length){ toast('No hay datos para exportar.', 'err'); return; }
-
-  const detalle = filas.map(f => ({
-    'Persona': f.nombre,
-    'Mes': mesLabel(f.mes),
-    'Estado': f.estado,
-    'Monto': f.monto,
-    'Fecha de pago': f.fechaPago || '',
-    'Registrado por': f.registradoPor || ''
-  }));
-  const ws1 = XLSX.utils.json_to_sheet(detalle);
-  ws1['!cols'] = [{wch:28},{wch:14},{wch:10},{wch:12},{wch:14},{wch:18}];
-
-  // Resumen por mes
-  const porMes = {};
-  filas.forEach(f => {
-    if (!porMes[f.mes]) porMes[f.mes] = { pagos:0, total:0 };
-    if (f.estado === 'Pagó'){ porMes[f.mes].pagos++; porMes[f.mes].total += Number(f.monto)||0; }
+  if(typeof XLSX==='undefined'){toast('No se pudo cargar el exportador.','err');return;}const filas=calcularReporte();if(!filas.length){toast('No hay datos.','err');return;}
+  const ws1=XLSX.utils.json_to_sheet(filas.map(f=>({'Persona':f.nombre,'Mes':mesLabel(f.mes),'Estado':f.estado,'Monto':f.monto,'Fecha de pago':f.fechaPago||'','Registrado por':f.registradoPor||''})));ws1['!cols']=[{wch:28},{wch:14},{wch:10},{wch:12},{wch:14},{wch:18}];
+  const porMes={};filas.forEach(f=>{if(!porMes[f.mes])porMes[f.mes]={pagos:0,total:0};if(f.estado==='Pagó'){porMes[f.mes].pagos++;porMes[f.mes].total+=Number(f.monto)||0;}});
+  const ws2=XLSX.utils.json_to_sheet(Object.keys(porMes).sort().map(m=>({'Mes':mesLabel(m),'Pagos':porMes[m].pagos,'Total recaudado':porMes[m].total})));ws2['!cols']=[{wch:18},{wch:10},{wch:16}];
+  const porPer={};filas.forEach(f=>{if(!porPer[f.nombre])porPer[f.nombre]={pagos:0,total:0};if(f.estado==='Pagó'){porPer[f.nombre].pagos++;porPer[f.nombre].total+=Number(f.monto)||0;}});
+  const ws3=XLSX.utils.json_to_sheet(Object.keys(porPer).sort().map(n=>({'Persona':n,'Pagos realizados':porPer[n].pagos,'Total aportado':porPer[n].total})));ws3['!cols']=[{wch:28},{wch:18},{wch:16}];
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws1,'Detalle');XLSX.utils.book_append_sheet(wb,ws2,'Por mes');XLSX.utils.book_append_sheet(wb,ws3,'Por persona');
+  // Gastos con detalle de artículos
+  const gastosFilas=[];(DATA.gastos||[]).slice().sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||'')).forEach(g=>{
+    const items=g.items||[];if(items.length){items.forEach(it=>{gastosFilas.push({'Fecha':g.fecha,'Factura':g.numFactura||'','Motivo':g.motivo||'','Artículo':it.nombre,'Precio':Number(it.precio)||0,'Total gasto':g.monto,'Registrado por':g.registradoPor});});}
+    else{gastosFilas.push({'Fecha':g.fecha,'Factura':g.numFactura||'','Motivo':g.motivo||'','Artículo':'','Precio':g.monto,'Total gasto':g.monto,'Registrado por':g.registradoPor});}
   });
-  const resMes = Object.keys(porMes).sort().map(m => ({
-    'Mes': mesLabel(m),
-    'Pagos': porMes[m].pagos,
-    'Total recaudado': porMes[m].total
-  }));
-  const ws2 = XLSX.utils.json_to_sheet(resMes.length ? resMes : [{'Mes':'(sin datos)','Pagos':0,'Total recaudado':0}]);
-  ws2['!cols'] = [{wch:18},{wch:10},{wch:16}];
-
-  // Resumen por persona
-  const porPer = {};
-  filas.forEach(f => {
-    if (!porPer[f.nombre]) porPer[f.nombre] = { pagos:0, total:0 };
-    if (f.estado === 'Pagó'){ porPer[f.nombre].pagos++; porPer[f.nombre].total += Number(f.monto)||0; }
-  });
-  const resPer = Object.keys(porPer).sort().map(n => ({
-    'Persona': n,
-    'Pagos realizados': porPer[n].pagos,
-    'Total aportado': porPer[n].total
-  }));
-  const ws3 = XLSX.utils.json_to_sheet(resPer.length ? resPer : [{'Persona':'(sin datos)','Pagos realizados':0,'Total aportado':0}]);
-  ws3['!cols'] = [{wch:28},{wch:18},{wch:16}];
-
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws1, 'Detalle');
-  XLSX.utils.book_append_sheet(wb, ws2, 'Por mes');
-  XLSX.utils.book_append_sheet(wb, ws3, 'Por persona');
-
-  // Hoja de Gastos
-  const gastosOrdenados = (DATA.gastos||[]).slice().sort((a,b) => (b.fecha||'').localeCompare(a.fecha||''));
-  const gastosFilas = gastosOrdenados.map(g => ({
-    'Fecha': g.fecha,
-    'Motivo': g.motivo,
-    'Monto': Number(g.monto)||0,
-    'Registrado por': g.registradoPor
-  }));
-  const ws4 = XLSX.utils.json_to_sheet(gastosFilas.length ? gastosFilas : [{'Fecha':'(sin gastos)','Motivo':'','Monto':0,'Registrado por':''}]);
-  ws4['!cols'] = [{wch:12},{wch:38},{wch:14},{wch:18}];
-  XLSX.utils.book_append_sheet(wb, ws4, 'Gastos');
-
-  // Hoja de Balance general
-  const totalIng = DATA.pagos.reduce((s,p) => s + (Number(p.monto)||0), 0);
-  const totalGas = (DATA.gastos||[]).reduce((s,g) => s + (Number(g.monto)||0), 0);
-  const balanceFilas = [
-    { 'Concepto': 'Total aportes (ingresos)', 'Monto (L.)': totalIng },
-    { 'Concepto': 'Total gastos (salidas)',   'Monto (L.)': -totalGas },
-    { 'Concepto': 'SALDO ACTUAL',             'Monto (L.)': totalIng - totalGas }
-  ];
-  const ws5 = XLSX.utils.json_to_sheet(balanceFilas);
-  ws5['!cols'] = [{wch:30},{wch:14}];
-  XLSX.utils.book_append_sheet(wb, ws5, 'Balance');
-
-  const f = new Date();
-  XLSX.writeFile(wb, 'Cooperacha_VIMASSS_' + f.getFullYear()+pad(f.getMonth()+1)+pad(f.getDate()) + '.xlsx');
-  toast('Excel generado (' + filas.length + ' registros + balance).', 'ok');
+  const ws4=XLSX.utils.json_to_sheet(gastosFilas.length?gastosFilas:[{'Fecha':'(sin gastos)'}]);ws4['!cols']=[{wch:12},{wch:12},{wch:30},{wch:28},{wch:12},{wch:14},{wch:18}];
+  XLSX.utils.book_append_sheet(wb,ws4,'Gastos');
+  const tI=DATA.pagos.reduce((s,p)=>s+(Number(p.monto)||0),0),tG=(DATA.gastos||[]).reduce((s,g)=>s+(Number(g.monto)||0),0);
+  const ws5=XLSX.utils.json_to_sheet([{'Concepto':'Total aportes (ingresos)','Monto (L.)':tI},{'Concepto':'Total gastos (salidas)','Monto (L.)':-tG},{'Concepto':'SALDO ACTUAL','Monto (L.)':tI-tG}]);ws5['!cols']=[{wch:30},{wch:14}];
+  XLSX.utils.book_append_sheet(wb,ws5,'Balance');
+  const f=new Date();XLSX.writeFile(wb,'Cooperacha_VIMASSS_'+f.getFullYear()+pad(f.getMonth()+1)+pad(f.getDate())+'.xlsx');toast('Excel generado.','ok');
 }
 
-/* ════════════════════════════════════════════════════════════════
-   USUARIOS (admin)
-   ════════════════════════════════════════════════════════════════ */
-function pintarUsuarios(){
-  const cont = document.getElementById('tbl-usuarios');
-  if (!DATA.usuarios.length){
-    cont.innerHTML = '<div class="tbl-empty">No hay usuarios.</div>';
-    return;
-  }
-  const filas = DATA.usuarios.slice().sort((a,b) => a.usuario.localeCompare(b.usuario)).map(u => {
-    const per = u.personaId ? DATA.personas.find(p => p.id === u.personaId) : null;
-    return `<tr>
-      <td data-label="Usuario"><div class="nm">${esc(u.usuario)}</div><div class="mono">${esc(u.nombre)}</div></td>
-      <td data-label="Rol"><span class="pill ${u.rol==='admin'?'admin':'usuario'}">${u.rol==='admin'?'Admin':'Usuario'}</span></td>
-      <td data-label="Persona vinculada">${per ? esc(per.nombre) : '<span style="color:var(--text-soft)">—</span>'}</td>
-      <td data-label="Estado">${u.activo ? '<span class="pill activo">Activo</span>' : '<span class="pill inactivo">Inactivo</span>'}</td>
-      <td data-label="Creado">${esc(u.creadoEn)}</td>
-      <td data-label="Acciones"><div class="acts">
-        <button class="btn btn-sm" onclick="abrirUsuario('${esc(u.usuario)}')">✏ Editar</button>
-        ${u.usuario !== S.sesion.usuario ? `<button class="btn btn-sm btn-danger" onclick="borrarUsuario('${esc(u.usuario)}', this)">Borrar</button>` : ''}
-      </div></td>
-    </tr>`;
-  }).join('');
-  cont.innerHTML = `<table><thead><tr><th>Usuario</th><th>Rol</th><th>Persona</th><th>Estado</th><th>Creado</th><th></th></tr></thead><tbody>${filas}</tbody></table>`;
-}
+/* USUARIOS */
+function pintarUsuarios(){const cont=document.getElementById('tbl-usuarios');if(!DATA.usuarios.length){cont.innerHTML='<div class="tbl-empty">No hay usuarios.</div>';return;}
+  cont.innerHTML=`<table><thead><tr><th>Usuario</th><th>Rol</th><th>Persona</th><th>Estado</th><th>Creado</th><th></th></tr></thead><tbody>${DATA.usuarios.slice().sort((a,b)=>a.usuario.localeCompare(b.usuario)).map(u=>{const per=u.personaId?DATA.personas.find(p=>p.id===u.personaId):null;return`<tr><td data-label="Usuario"><div class="nm">${esc(u.usuario)}</div><div class="mono">${esc(u.nombre)}</div></td><td data-label="Rol"><span class="pill ${u.rol==='admin'?'admin':'usuario'}">${u.rol==='admin'?'Admin':'Usuario'}</span></td><td data-label="Persona">${per?esc(per.nombre):'<span style="color:var(--text-soft)">—</span>'}</td><td data-label="Estado">${u.activo?'<span class="pill activo">Activo</span>':'<span class="pill inactivo">Inactivo</span>'}</td><td data-label="Creado">${esc(u.creadoEn)}</td><td data-label="Acciones"><div class="acts"><button class="btn btn-sm" onclick="abrirUsuario('${esc(u.usuario)}')">✏</button>${u.usuario!==S.sesion.usuario?`<button class="btn btn-sm btn-danger" onclick="borrarUsuario('${esc(u.usuario)}',this)">Borrar</button>`:''}</div></td></tr>`;}).join('')}</tbody></table>`;}
+function llenarSelectPersonas(selId,selVal){document.getElementById(selId).innerHTML='<option value="">— Sin vincular —</option>'+DATA.personas.slice().sort((a,b)=>a.nombre.localeCompare(b.nombre)).map(p=>`<option value="${p.id}" ${selVal===p.id?'selected':''}>${esc(p.nombre)}</option>`).join('');}
+function abrirUsuario(usuario){editingUsuario=usuario||null;document.getElementById('usu-modal-title').textContent=usuario?'Editar usuario':'Nuevo usuario';document.getElementById('usu-user').value='';document.getElementById('usu-nombre').value='';document.getElementById('usu-pass').value='';document.getElementById('usu-rol').value='usuario';document.getElementById('usu-activo').value='true';document.getElementById('usu-pass-lbl').textContent=usuario?'Nueva contraseña (déjalo vacío para no cambiar)':'Contraseña *';llenarSelectPersonas('usu-persona','');if(usuario){const u=DATA.usuarios.find(x=>x.usuario===usuario);if(u){document.getElementById('usu-user').value=u.usuario;document.getElementById('usu-user').disabled=true;document.getElementById('usu-nombre').value=u.nombre;document.getElementById('usu-rol').value=u.rol;document.getElementById('usu-activo').value=u.activo?'true':'false';llenarSelectPersonas('usu-persona',u.personaId||'');}}else{document.getElementById('usu-user').disabled=false;}abrir('ov-usuario');}
+document.getElementById('usu-save').addEventListener('click',async function(){const usuario=document.getElementById('usu-user').value.trim().toLowerCase(),nombre=document.getElementById('usu-nombre').value.trim(),pass=document.getElementById('usu-pass').value,rol=document.getElementById('usu-rol').value,activo=document.getElementById('usu-activo').value,personaId=document.getElementById('usu-persona').value;if(!usuario||!nombre){toast('Usuario y nombre obligatorios.','err');return;}if(!editingUsuario&&!pass){toast('La contraseña es obligatoria.','err');return;}setLoading(this,true);try{const params=editingUsuario?{action:'editar_usuario',token:S.token,usuario,nombre,rol,activo,personaId}:{action:'crear_usuario',token:S.token,usuario,nombre,pass,rol,personaId};if(editingUsuario&&pass)params.pass=pass;const res=await api(params);if(!res.ok)throw new Error(res.error);toast(editingUsuario?'Usuario actualizado.':'Usuario creado.','ok');cerrar('ov-usuario');await refrescar();pintarUsuarios();}catch(e){toast(e.message,'err');}finally{setLoading(this,false);}});
+async function borrarUsuario(usuario,btn){const ok=await confirmar({titulo:'Borrar usuario',msg:`¿Borrar el usuario "${usuario}"?`,ok:'Sí, borrar',danger:true});if(!ok)return;setLoading(btn,true);try{const res=await api({action:'borrar_usuario',token:S.token,usuario});if(!res.ok)throw new Error(res.error);toast('Usuario borrado.','ok');await refrescar();pintarUsuarios();}catch(e){toast(e.message,'err');setLoading(btn,false);}}
 
-function llenarSelectPersonas(selectId, selectedId){
-  const sel = document.getElementById(selectId);
-  sel.innerHTML = '<option value="">— Sin vincular —</option>' + DATA.personas.slice().sort((a,b) => a.nombre.localeCompare(b.nombre)).map(p => `<option value="${p.id}" ${selectedId===p.id?'selected':''}>${esc(p.nombre)}</option>`).join('');
-}
-function abrirUsuario(usuario){
-  editingUsuario = usuario || null;
-  document.getElementById('usu-modal-title').textContent = usuario ? 'Editar usuario' : 'Nuevo usuario';
-  document.getElementById('usu-user').value = '';
-  document.getElementById('usu-nombre').value = '';
-  document.getElementById('usu-pass').value = '';
-  document.getElementById('usu-rol').value = 'usuario';
-  document.getElementById('usu-activo').value = 'true';
-  document.getElementById('usu-pass-lbl').textContent = usuario ? 'Nueva contraseña (déjalo vacío para no cambiar)' : 'Contraseña *';
-  llenarSelectPersonas('usu-persona', '');
-  if (usuario){
-    const u = DATA.usuarios.find(x => x.usuario === usuario);
-    if (u){
-      document.getElementById('usu-user').value = u.usuario;
-      document.getElementById('usu-user').disabled = true;
-      document.getElementById('usu-nombre').value = u.nombre;
-      document.getElementById('usu-rol').value = u.rol;
-      document.getElementById('usu-activo').value = u.activo ? 'true' : 'false';
-      llenarSelectPersonas('usu-persona', u.personaId || '');
-    }
-  } else {
-    document.getElementById('usu-user').disabled = false;
-  }
-  abrir('ov-usuario');
-}
-document.getElementById('usu-save').addEventListener('click', async function(){
-  const usuario = document.getElementById('usu-user').value.trim().toLowerCase();
-  const nombre = document.getElementById('usu-nombre').value.trim();
-  const pass = document.getElementById('usu-pass').value;
-  const rol = document.getElementById('usu-rol').value;
-  const activo = document.getElementById('usu-activo').value;
-  const personaId = document.getElementById('usu-persona').value;
-  if (!usuario || !nombre){ toast('Usuario y nombre son obligatorios.', 'err'); return; }
-  if (!editingUsuario && !pass){ toast('La contraseña es obligatoria para nuevos usuarios.', 'err'); return; }
-  setLoading(this, true);
-  try{
-    const params = editingUsuario
-      ? { action:'editar_usuario', token:S.token, usuario, nombre, rol, activo, personaId }
-      : { action:'crear_usuario',  token:S.token, usuario, nombre, pass, rol, personaId };
-    if (editingUsuario && pass) params.pass = pass;
-    const res = await api(params);
-    if (!res.ok) throw new Error(res.error);
-    toast(editingUsuario ? 'Usuario actualizado.' : 'Usuario creado.', 'ok');
-    cerrar('ov-usuario');
-    await refrescar();
-    pintarUsuarios();
-  } catch(e){ toast(e.message, 'err'); }
-  finally{ setLoading(this, false); }
-});
+/* CONFIG */
+function pintarConfig(){document.getElementById('cf-nombre').value=DATA.config.nombre_grupo||'';document.getElementById('cf-monto').value=DATA.config.monto_default||'200';document.getElementById('cf-inicio').value=DATA.config.mes_inicio||'';document.getElementById('cf-fin').value=DATA.config.mes_fin||'';}
+document.getElementById('cf-save').addEventListener('click',async function(){const nombre=document.getElementById('cf-nombre').value.trim(),monto=document.getElementById('cf-monto').value.trim(),inicio=document.getElementById('cf-inicio').value.trim(),fin=document.getElementById('cf-fin').value.trim();if(!/^\d{4}-\d{2}$/.test(inicio)){toast('Mes de inicio inválido.','err');return;}if(!/^\d{4}-\d{2}$/.test(fin)){toast('Mes de fin inválido.','err');return;}if(fin<inicio){toast('El mes de fin no puede ser anterior al de inicio.','err');return;}if(isNaN(parseFloat(monto))||parseFloat(monto)<0){toast('Monto inválido.','err');return;}setLoading(this,true);try{await api({action:'set_config',token:S.token,llave:'nombre_grupo',valor:nombre});await api({action:'set_config',token:S.token,llave:'monto_default',valor:monto});await api({action:'set_config',token:S.token,llave:'mes_inicio',valor:inicio});await api({action:'set_config',token:S.token,llave:'mes_fin',valor:fin});toast('Configuración guardada.','ok');await refrescar();pintarConfig();}catch(e){toast(e.message,'err');}finally{setLoading(this,false);}});
 
-async function borrarUsuario(usuario, btn){
-  const ok = await confirmar({ titulo:'Borrar usuario', msg:`¿Borrar el usuario "${usuario}"?`, ok:'Sí, borrar', danger:true });
-  if (!ok) return;
-  setLoading(btn, true);
-  try{
-    const res = await api({ action:'borrar_usuario', token:S.token, usuario });
-    if (!res.ok) throw new Error(res.error);
-    toast('Usuario borrado.', 'ok');
-    await refrescar();
-    pintarUsuarios();
-  } catch(e){ toast(e.message, 'err'); setLoading(btn, false); }
-}
+/* PASS */
+function abrirCambiarPass(){document.getElementById('p-new').value='';abrir('ov-pass');}
+document.getElementById('pass-save').addEventListener('click',async function(){const pass=document.getElementById('p-new').value;if(pass.length<5){toast('Mínimo 5 caracteres.','err');return;}setLoading(this,true);try{const r=await api({action:'cambiar_pass',token:S.token,pass});if(!r.ok)throw new Error(r.error);toast('Contraseña cambiada.','ok');cerrar('ov-pass');}catch(e){toast(e.message,'err');}finally{setLoading(this,false);}});
 
-/* ════════════════════════════════════════════════════════════════
-   CONFIGURACIÓN (admin)
-   ════════════════════════════════════════════════════════════════ */
-function pintarConfig(){
-  document.getElementById('cf-nombre').value = DATA.config.nombre_grupo || '';
-  document.getElementById('cf-monto').value = DATA.config.monto_default || '200';
-  document.getElementById('cf-inicio').value = DATA.config.mes_inicio || '';
-  document.getElementById('cf-fin').value = DATA.config.mes_fin || '';
-}
-document.getElementById('cf-save').addEventListener('click', async function(){
-  const nombre = document.getElementById('cf-nombre').value.trim();
-  const monto = document.getElementById('cf-monto').value.trim();
-  const inicio = document.getElementById('cf-inicio').value.trim();
-  const fin = document.getElementById('cf-fin').value.trim();
-  if (!/^\d{4}-\d{2}$/.test(inicio)){ toast('Mes de inicio inválido.', 'err'); return; }
-  if (!/^\d{4}-\d{2}$/.test(fin)){ toast('Mes de fin inválido.', 'err'); return; }
-  if (fin < inicio){ toast('El mes de fin no puede ser anterior al de inicio.', 'err'); return; }
-  if (isNaN(parseFloat(monto)) || parseFloat(monto) < 0){ toast('Monto inválido.', 'err'); return; }
-  setLoading(this, true);
-  try{
-    await api({ action:'set_config', token:S.token, llave:'nombre_grupo', valor:nombre });
-    await api({ action:'set_config', token:S.token, llave:'monto_default', valor:monto });
-    await api({ action:'set_config', token:S.token, llave:'mes_inicio', valor:inicio });
-    await api({ action:'set_config', token:S.token, llave:'mes_fin', valor:fin });
-    toast('Configuración guardada.', 'ok');
-    await refrescar();
-    pintarConfig();
-  } catch(e){ toast(e.message, 'err'); }
-  finally{ setLoading(this, false); }
-});
+/* CONFIRMAR */
+const ICO_INFO='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>',ICO_DANGER='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 4.3 2.6 18a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>';
+function confirmar(opt){opt=opt||{};return new Promise(res=>{document.getElementById('cf-title').textContent=opt.titulo||'¿Confirmar?';document.getElementById('cf-msg').textContent=opt.msg||'';const icon=document.getElementById('cf-icon');icon.className='cf-ic '+(opt.danger?'danger':'info');icon.innerHTML=opt.danger?ICO_DANGER:ICO_INFO;const ok=document.getElementById('cf-ok'),cancel=document.getElementById('cf-cancel'),ov=document.getElementById('ov-confirm');ok.textContent=opt.ok||'Confirmar';ok.className='btn '+(opt.danger?'btn-danger':'btn-primary');function fin(val){ov.classList.remove('show');ok.onclick=cancel.onclick=ov.onclick=null;res(val);}ok.onclick=()=>fin(true);cancel.onclick=()=>fin(false);ov.onclick=e=>{if(e.target===ov)fin(false);};ov.classList.add('show');});}
 
-/* ════════════════════════════════════════════════════════════════
-   CAMBIO DE CONTRASEÑA
-   ════════════════════════════════════════════════════════════════ */
-function abrirCambiarPass(){ document.getElementById('p-new').value = ''; abrir('ov-pass'); }
-document.getElementById('pass-save').addEventListener('click', async function(){
-  const pass = document.getElementById('p-new').value;
-  if (pass.length < 5){ toast('Mínimo 5 caracteres.', 'err'); return; }
-  setLoading(this, true);
-  try{
-    const r = await api({ action:'cambiar_pass', token:S.token, pass });
-    if (!r.ok) throw new Error(r.error);
-    toast('Contraseña cambiada.', 'ok');
-    cerrar('ov-pass');
-  } catch(e){ toast(e.message, 'err'); }
-  finally{ setLoading(this, false); }
-});
-
-/* ════════════════════════════════════════════════════════════════
-   CONFIRMACIÓN GENÉRICA
-   ════════════════════════════════════════════════════════════════ */
-const ICO_INFO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>';
-const ICO_DANGER = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 4.3 2.6 18a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>';
-function confirmar(opt){
-  opt = opt || {};
-  return new Promise(res => {
-    document.getElementById('cf-title').textContent = opt.titulo || '¿Confirmar?';
-    document.getElementById('cf-msg').textContent = opt.msg || '';
-    const icon = document.getElementById('cf-icon');
-    icon.className = 'cf-ic ' + (opt.danger ? 'danger' : 'info');
-    icon.innerHTML = opt.danger ? ICO_DANGER : ICO_INFO;
-    const ok = document.getElementById('cf-ok'), cancel = document.getElementById('cf-cancel'), ov = document.getElementById('ov-confirm');
-    ok.textContent = opt.ok || 'Confirmar';
-    ok.className = 'btn ' + (opt.danger ? 'btn-danger' : 'btn-primary');
-    function fin(val){ ov.classList.remove('show'); ok.onclick = cancel.onclick = ov.onclick = null; res(val); }
-    ok.onclick = () => fin(true);
-    cancel.onclick = () => fin(false);
-    ov.onclick = e => { if (e.target === ov) fin(false); };
-    ov.classList.add('show');
-  });
-}
-
-/* ════════════════════════════════════════════════════════════════
-   INICIO
-   ════════════════════════════════════════════════════════════════ */
-(function init(){
-  reloj();
-  if (S.token && S.sesion){
-    arrancar();
-  } else {
-    document.getElementById('login-screen').style.display = 'flex';
-    setTimeout(() => document.getElementById('lg-user').focus(), 50);
-  }
-})();
+/* INIT */
+(function init(){reloj();if(S.token&&S.sesion){arrancar();}else{document.getElementById('login-screen').style.display='flex';setTimeout(()=>document.getElementById('lg-user').focus(),50);}})();
 </script>
 </body>
 </html>
