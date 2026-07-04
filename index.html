@@ -124,6 +124,7 @@
   .pill.usuario{background:#e2e8f0;color:#475569}
   .pill.activo{background:var(--green-soft);color:var(--green-text)}
   .pill.inactivo{background:var(--red-soft);color:var(--red-text)}
+  .pill.destino{background:#ede9fe;color:#6d28d9}
   .acts{display:flex;gap:6px;flex-wrap:wrap}
   .tbl-empty{padding:46px;text-align:center;color:var(--text-dim);font-size:.9rem}
 
@@ -171,9 +172,7 @@
   .sect-h .sh-left{flex:1;min-width:200px}
   .sect-h .sh-right{display:flex;gap:8px;flex-wrap:wrap}
 
-  /* Items list in gasto modal */
   .items-list{margin-bottom:10px}
-  .item-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
   .item-row{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
   .item-row .item-nombre{flex:1;min-width:120px}
   .item-row .item-cant{width:70px}
@@ -188,7 +187,6 @@
   .gas-total-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--soft);border:1px solid var(--border);border-radius:10px;margin-top:8px}
   .gas-total-bar .lbl{font-size:.85rem;color:var(--text-dim);font-weight:500}
   .gas-total-bar .val{font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--text)}
-  /* Items detail in table */
   .items-detail{margin-top:4px}
   .items-detail .item-line{display:flex;justify-content:space-between;font-size:.8rem;color:var(--text-dim);padding:2px 0}
   .items-detail .item-line .iname{flex:1}
@@ -281,7 +279,7 @@
       </section>
       <section class="view" id="v-pagos">
         <div class="sect-h"><div class="sh-left"><div class="page-title">Pagos</div><div class="page-sub">Registra pagos eligiendo persona y mes.</div></div><div class="sh-right"><button class="btn btn-primary" onclick="abrirNuevoPago()">+ Registrar pago</button></div></div>
-        <div class="toolbar"><label style="font-size:.85rem;color:var(--text-dim);font-weight:500">Ver mes:</label><select id="pag-mes"></select><input type="search" id="pag-busca" class="grow" placeholder="Buscar persona…"></div>
+        <div class="toolbar"><label style="font-size:.85rem;color:var(--text-dim);font-weight:500">Ver mes:</label><select id="pag-mes"></select><label style="font-size:.85rem;color:var(--text-dim);font-weight:500;margin-left:6px">Destino:</label><select id="pag-destino-filtro"><option value="">Todos</option></select><input type="search" id="pag-busca" class="grow" placeholder="Buscar persona…"></div>
         <div class="cards" id="pag-cards"></div><div class="tbl-wrap" id="tbl-pagos"></div>
       </section>
       <section class="view" id="v-gastos">
@@ -290,7 +288,7 @@
       </section>
       <section class="view" id="v-reportes">
         <div class="page-title">Reportes</div><div class="page-sub">Filtra por mes o por persona y exporta a Excel.</div>
-        <div class="toolbar"><select id="rep-mes"><option value="">Todos los meses</option></select><select id="rep-persona"><option value="">Todas las personas</option></select><select id="rep-estado"><option value="">Cualquier estado</option><option value="pago">Solo Pagó</option><option value="nopago">Solo No pagó</option></select><div style="flex:1"></div><button class="btn btn-primary" onclick="exportarExcel()">⬇ Exportar a Excel</button></div>
+        <div class="toolbar"><select id="rep-mes"><option value="">Todos los meses</option></select><select id="rep-persona"><option value="">Todas las personas</option></select><select id="rep-estado"><option value="">Cualquier estado</option><option value="pago">Solo Pagó</option><option value="nopago">Solo No pagó</option></select><select id="rep-destino"><option value="">Todos los destinos</option></select><div style="flex:1"></div><button class="btn btn-primary" onclick="exportarExcel()">⬇ Exportar a Excel</button></div>
         <div class="cards" id="rep-cards"></div><div class="tbl-wrap" id="tbl-reportes"></div>
       </section>
       <section class="view" id="v-usuarios">
@@ -322,9 +320,9 @@
 <div class="overlay" id="ov-persona"><div class="modal"><div class="modal-h"><h3 id="per-modal-title">Nueva persona</h3><button class="modal-x" onclick="cerrar('ov-persona')">&times;</button></div><div class="modal-b"><div class="field"><label>Nombre completo *</label><input id="per-nombre" autocomplete="off" placeholder="Ej. Juan Carlos Pérez López"></div></div><div class="modal-f"><button class="btn" onclick="cerrar('ov-persona')">Cancelar</button><button class="btn btn-primary" id="per-save">Guardar</button></div></div></div>
 
 <!-- MODAL PAGO -->
-<div class="overlay" id="ov-pago"><div class="modal"><div class="modal-h"><h3 id="pago-modal-title">Registrar pago</h3><button class="modal-x" onclick="cerrar('ov-pago')">&times;</button></div><div class="modal-b"><div class="field"><label>Persona *</label><select id="pago-persona"></select></div><div class="field"><label>Mes *</label><select id="pago-mes-sel"></select></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:14px"><div class="field"><label>Monto (L.)</label><input id="pago-monto" type="number" min="0" step="0.01" inputmode="decimal"></div><div class="field"><label>Fecha de pago</label><input id="pago-fecha" type="date"></div></div></div><div class="modal-f"><button class="btn" onclick="cerrar('ov-pago')">Cancelar</button><button class="btn btn-primary" id="pago-save">Confirmar</button></div></div></div>
+<div class="overlay" id="ov-pago"><div class="modal"><div class="modal-h"><h3 id="pago-modal-title">Registrar pago</h3><button class="modal-x" onclick="cerrar('ov-pago')">&times;</button></div><div class="modal-b"><div class="field"><label>Persona *</label><select id="pago-persona"></select></div><div class="field"><label>Mes *</label><select id="pago-mes-sel"></select></div><div class="field"><label>Destino *</label><select id="pago-destino"></select></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:14px"><div class="field"><label>Monto (L.)</label><input id="pago-monto" type="number" min="0" step="0.01" inputmode="decimal"></div><div class="field"><label>Fecha de pago</label><input id="pago-fecha" type="date"></div></div></div><div class="modal-f"><button class="btn" onclick="cerrar('ov-pago')">Cancelar</button><button class="btn btn-primary" id="pago-save">Confirmar</button></div></div></div>
 
-<!-- MODAL GASTO (nuevo: con artículos) -->
+<!-- MODAL GASTO -->
 <div class="overlay" id="ov-gasto">
   <div class="modal" style="max-width:540px">
     <div class="modal-h"><h3 id="gas-modal-title">Nuevo gasto</h3><button class="modal-x" onclick="cerrar('ov-gasto')">&times;</button></div>
@@ -334,6 +332,7 @@
         <div class="field"><label>Fecha *</label><input id="gas-fecha" type="date"></div>
       </div>
       <div class="field"><label>Motivo / descripción <span style="color:var(--text-soft);font-weight:400">(opcional)</span></label><input id="gas-motivo" autocomplete="off" placeholder="Ej. Compra para reunión del 15 jun"></div>
+      <div class="field"><label>Destino *</label><select id="gas-destino"></select></div>
       <div style="margin-bottom:6px"><label style="font-size:.82rem;font-weight:500;color:var(--text-dim)">Artículos *</label></div>
       <div class="items-list" id="gas-items"></div>
       <button class="btn-add-item" type="button" onclick="agregarItemGasto()">+ Agregar artículo</button>
@@ -355,7 +354,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbwC4QxkUVBFdjusJiQPZ9ubnpFvKZH9YVSMWDuiB8BiLAzgQ-3zMYiD0LeJqNMImo_UEg/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbxtOdk4-9zlFoOHfwOcPVnQs37euxEh4cChVjpPYA8skvEp7VsCqwgDP6aBmFLDluoS1A/exec";
 
 const MESES_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const _mem = {};
@@ -366,7 +365,7 @@ const store = {
 };
 let S = { token: store.get('coop_token'), sesion: null };
 try { S.sesion = JSON.parse(store.get('coop_sesion') || 'null'); } catch(e){}
-let DATA = { config:{}, personas:[], pagos:[], gastos:[], usuarios:[] };
+let DATA = { config:{}, personas:[], pagos:[], gastos:[], usuarios:[], destinos:[] };
 let editingPersonaId=null, editingPagoId=null, editingUsuario=null, editingGastoId=null;
 
 async function api(params, method='POST'){
@@ -399,6 +398,13 @@ function abrir(id){document.getElementById(id).classList.add('show');}
 function cerrar(id){document.getElementById(id).classList.remove('show');}
 function setLoading(btn,on){if(!btn)return;if(on){btn.classList.add('loading');btn.disabled=true;}else{btn.classList.remove('loading');btn.disabled=false;}}
 document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('show');}));
+
+/* Helper: llena un <select> con los destinos */
+function llenarSelectDestino(selId, selVal){
+  const sel=document.getElementById(selId);
+  sel.innerHTML=DATA.destinos.map(d=>`<option value="${esc(d)}" ${selVal===d?'selected':''}>${esc(d)}</option>`).join('');
+  if(!selVal && DATA.destinos.length) sel.value=DATA.destinos[0];
+}
 
 /* NAV */
 const NAV={
@@ -435,7 +441,7 @@ function irA(v){
   const t={dashboard:'Dashboard','mi-estado':'Mi estado',personas:'Personas',pagos:'Pagos por mes',gastos:'Gastos',reportes:'Reportes',usuarios:'Usuarios',config:'Configuración',ayuda:'Ayuda'};
   document.getElementById('tb-title').textContent=t[v]||'';document.getElementById('sidebar').classList.remove('open');
   if(v==='dashboard')pintarDashboard();if(v==='mi-estado')pintarMiEstado();if(v==='personas')pintarPersonas();
-  if(v==='pagos'){pintarPagosMesSelect();pintarPagosTabla();}if(v==='gastos')pintarGastos();
+  if(v==='pagos'){pintarPagosMesSelect();pintarPagosDestinoFiltro();pintarPagosTabla();}if(v==='gastos')pintarGastos();
   if(v==='reportes'){pintarReportesFiltros();pintarReportes();}if(v==='usuarios')pintarUsuarios();if(v==='config')pintarConfig();
 }
 document.getElementById('menu-btn').addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('open'));
@@ -453,8 +459,8 @@ async function entrar(){
   }catch(e){err.textContent=e.message;err.classList.add('show');}finally{setLoading(btn,false);}
 }
 function salir(expirada){if(S.token){try{api({action:'logout',token:S.token});}catch(e){}}store.del('coop_token');store.del('coop_sesion');S={token:null,sesion:null};document.getElementById('app').classList.remove('show');document.getElementById('login-screen').style.display='flex';document.getElementById('lg-user').value='';document.getElementById('lg-pass').value='';if(expirada)setTimeout(()=>toast('La sesión expiró. Vuelve a entrar.','err'),100);}
-async function arrancar(){try{const res=await api({action:'bootstrap',token:S.token});if(!res.ok)throw new Error(res.error);DATA={config:res.config,personas:res.personas,pagos:res.pagos,gastos:res.gastos||[],usuarios:res.usuarios};document.getElementById('login-screen').style.display='none';document.getElementById('app').classList.add('show');reloj();pintarNav();irA(S.sesion.rol==='admin'?'dashboard':'mi-estado');}catch(e){toast(e.message,'err');salir(false);}}
-async function refrescar(){try{const res=await api({action:'bootstrap',token:S.token});if(!res.ok)throw new Error(res.error);DATA={config:res.config,personas:res.personas,pagos:res.pagos,gastos:res.gastos||[],usuarios:res.usuarios};}catch(e){toast(e.message,'err');}}
+async function arrancar(){try{const res=await api({action:'bootstrap',token:S.token});if(!res.ok)throw new Error(res.error);DATA={config:res.config,personas:res.personas,pagos:res.pagos,gastos:res.gastos||[],usuarios:res.usuarios,destinos:res.destinos||[]};document.getElementById('login-screen').style.display='none';document.getElementById('app').classList.add('show');reloj();pintarNav();irA(S.sesion.rol==='admin'?'dashboard':'mi-estado');}catch(e){toast(e.message,'err');salir(false);}}
+async function refrescar(){try{const res=await api({action:'bootstrap',token:S.token});if(!res.ok)throw new Error(res.error);DATA={config:res.config,personas:res.personas,pagos:res.pagos,gastos:res.gastos||[],usuarios:res.usuarios,destinos:res.destinos||[]};}catch(e){toast(e.message,'err');}}
 
 /* DASHBOARD */
 function pintarDashboard(){
@@ -465,8 +471,8 @@ function pintarDashboard(){
   document.getElementById('dash-mes-titulo').textContent='Estado de '+mesLabel(mAct);
   const pmm={};pm.forEach(p=>{pmm[p.personaId]=p;});
   if(!tp){document.getElementById('dash-mes').innerHTML='<div class="tbl-empty">Aún no hay personas registradas.</div>';}else{
-    const filas=DATA.personas.slice().sort((a,b)=>a.nombre.localeCompare(b.nombre)).map(per=>{const pg=pmm[per.id];return`<tr><td data-label="Persona"><span class="nm">${esc(per.nombre)}</span></td><td data-label="Estado">${pg?'<span class="pill pago">Pagó</span>':'<span class="pill nopago">No pagó</span>'}</td><td data-label="Monto"><span class="money">${pg?fmtL(pg.monto):'—'}</span></td><td data-label="Fecha">${pg?esc(pg.fechaPago):'—'}</td></tr>`;}).join('');
-    document.getElementById('dash-mes').innerHTML=`<div class="tbl-wrap" style="box-shadow:none;border:1px solid var(--border)"><table><thead><tr><th>Persona</th><th>Estado</th><th>Monto</th><th>Fecha de pago</th></tr></thead><tbody>${filas}</tbody></table></div>`;
+    const filas=DATA.personas.slice().sort((a,b)=>a.nombre.localeCompare(b.nombre)).map(per=>{const pg=pmm[per.id];return`<tr><td data-label="Persona"><span class="nm">${esc(per.nombre)}</span></td><td data-label="Estado">${pg?'<span class="pill pago">Pagó</span>':'<span class="pill nopago">No pagó</span>'}</td><td data-label="Monto"><span class="money">${pg?fmtL(pg.monto):'—'}</span></td><td data-label="Destino">${pg&&pg.destino?'<span class="pill destino">'+esc(pg.destino)+'</span>':'—'}</td><td data-label="Fecha">${pg?esc(pg.fechaPago):'—'}</td></tr>`;}).join('');
+    document.getElementById('dash-mes').innerHTML=`<div class="tbl-wrap" style="box-shadow:none;border:1px solid var(--border)"><table><thead><tr><th>Persona</th><th>Estado</th><th>Monto</th><th>Destino</th><th>Fecha de pago</th></tr></thead><tbody>${filas}</tbody></table></div>`;
   }
   if(!meses.length){document.getElementById('dash-meses').innerHTML='<div class="tbl-empty">Configura el "Mes de inicio" en Configuración.</div>';}else{
     const filas=meses.slice().reverse().map(m=>{const ps=DATA.pagos.filter(p=>p.mes===m);const total=ps.reduce((s,p)=>s+(Number(p.monto)||0),0);return`<tr><td data-label="Mes"><b>${esc(mesLabel(m))}</b></td><td data-label="Pagaron">${ps.length} / ${tp}</td><td data-label="Pendientes">${Math.max(0,tp-ps.length)}</td><td data-label="Recaudado"><span class="money">${fmtL(total)}</span></td></tr>`;}).join('');
@@ -482,8 +488,8 @@ function pintarMiEstado(){
   const cards=[{n:meses.length,l:'Meses activos',ic:'blue',svg:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>'},{n:mp.length,l:'Meses pagados',ic:'green',svg:'<path d="M20 6 9 17l-5-5"/>'},{n:meses.length-mp.length,l:'Meses pendientes',ic:'amber',svg:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>'},{n:fmtL(mp.reduce((s,p)=>s+(Number(p.monto)||0),0)),l:'Total aportado',ic:'slate',svg:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>'}];
   document.getElementById('mi-cards').innerHTML=cards.map(c=>`<div class="stat"><div class="ico ${c.ic}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${c.svg}</svg></div><div class="n">${c.n}</div><div class="l">${esc(c.l)}</div></div>`).join('');
   if(!meses.length){document.getElementById('mi-tabla').innerHTML='<div class="tbl-empty">El administrador aún no ha configurado el mes de inicio.</div>';return;}
-  const filas=meses.slice().reverse().map(m=>{const pg=mapa[m];return`<tr><td data-label="Mes"><b>${esc(mesLabel(m))}</b></td><td data-label="Estado">${pg?'<span class="pill pago">Pagó</span>':'<span class="pill nopago">No pagó</span>'}</td><td data-label="Monto"><span class="money">${pg?fmtL(pg.monto):'—'}</span></td><td data-label="Fecha">${pg?esc(pg.fechaPago):'—'}</td></tr>`;}).join('');
-  document.getElementById('mi-tabla').innerHTML=`<table><thead><tr><th>Mes</th><th>Estado</th><th>Monto</th><th>Fecha de pago</th></tr></thead><tbody>${filas}</tbody></table>`;
+  const filas=meses.slice().reverse().map(m=>{const pg=mapa[m];return`<tr><td data-label="Mes"><b>${esc(mesLabel(m))}</b></td><td data-label="Estado">${pg?'<span class="pill pago">Pagó</span>':'<span class="pill nopago">No pagó</span>'}</td><td data-label="Monto"><span class="money">${pg?fmtL(pg.monto):'—'}</span></td><td data-label="Destino">${pg&&pg.destino?'<span class="pill destino">'+esc(pg.destino)+'</span>':'—'}</td><td data-label="Fecha">${pg?esc(pg.fechaPago):'—'}</td></tr>`;}).join('');
+  document.getElementById('mi-tabla').innerHTML=`<table><thead><tr><th>Mes</th><th>Estado</th><th>Monto</th><th>Destino</th><th>Fecha de pago</th></tr></thead><tbody>${filas}</tbody></table>`;
 }
 
 /* PERSONAS */
@@ -499,23 +505,24 @@ async function borrarPersona(id,btn){const p=DATA.personas.find(x=>x.id===id);co
 
 /* PAGOS */
 function pintarPagosMesSelect(){const meses=listarMeses(DATA.config.mes_inicio,DATA.config.mes_fin);const sel=document.getElementById('pag-mes');const prev=sel.value;sel.innerHTML='<option value="">Todos los meses</option>'+meses.slice().reverse().map(m=>`<option value="${m}">${esc(mesLabel(m))}</option>`).join('');if(prev!==undefined&&(prev===''||meses.indexOf(prev)>=0)){sel.value=prev;}else{const ma=mesActual();sel.value=(meses.indexOf(ma)>=0)?ma:(meses.length?meses[meses.length-1]:'');}}
+function pintarPagosDestinoFiltro(){const sel=document.getElementById('pag-destino-filtro');const prev=sel.value;sel.innerHTML='<option value="">Todos</option>'+DATA.destinos.map(d=>`<option value="${esc(d)}">${esc(d)}</option>`).join('');if(prev)sel.value=prev;}
 function pintarPagosTabla(){
-  const mes=document.getElementById('pag-mes').value,q=(document.getElementById('pag-busca').value||'').toLowerCase(),personas=DATA.personas.slice().sort((a,b)=>a.nombre.localeCompare(b.nombre)),ce=document.getElementById('pag-cards'),cont=document.getElementById('tbl-pagos');
-  if(!mes){let pagos=DATA.pagos.slice();if(q)pagos=pagos.filter(pg=>{const per=DATA.personas.find(x=>x.id===pg.personaId);return per&&per.nombre.toLowerCase().indexOf(q)!==-1;});pagos.sort((a,b)=>(b.mes||'').localeCompare(a.mes||'')||(b.fechaPago||'').localeCompare(a.fechaPago||''));const total=pagos.reduce((s,p)=>s+(Number(p.monto)||0),0);
+  const mes=document.getElementById('pag-mes').value,q=(document.getElementById('pag-busca').value||'').toLowerCase(),destFiltro=document.getElementById('pag-destino-filtro').value,personas=DATA.personas.slice().sort((a,b)=>a.nombre.localeCompare(b.nombre)),ce=document.getElementById('pag-cards'),cont=document.getElementById('tbl-pagos');
+  if(!mes){let pagos=DATA.pagos.slice();if(q)pagos=pagos.filter(pg=>{const per=DATA.personas.find(x=>x.id===pg.personaId);return per&&per.nombre.toLowerCase().indexOf(q)!==-1;});if(destFiltro)pagos=pagos.filter(pg=>pg.destino===destFiltro);pagos.sort((a,b)=>(b.mes||'').localeCompare(a.mes||'')||(b.fechaPago||'').localeCompare(a.fechaPago||''));const total=pagos.reduce((s,p)=>s+(Number(p.monto)||0),0);
     ce.innerHTML=[{n:pagos.length,l:'Pagos registrados',ic:'green',svg:'<path d="M20 6 9 17l-5-5"/>'},{n:personas.length,l:'Personas',ic:'blue',svg:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>'},{n:fmtL(total),l:'Total recaudado',ic:'slate',svg:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>'}].map(c=>`<div class="stat"><div class="ico ${c.ic}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${c.svg}</svg></div><div class="n">${c.n}</div><div class="l">${esc(c.l)}</div></div>`).join('');
     if(!pagos.length){cont.innerHTML='<div class="tbl-empty">No hay pagos registrados.</div>';return;}
-    cont.innerHTML=`<table><thead><tr><th>Persona</th><th>Mes</th><th>Monto</th><th>Fecha</th><th></th></tr></thead><tbody>${pagos.map(pg=>{const per=DATA.personas.find(p=>p.id===pg.personaId);const nm=per?per.nombre:pg.personaId;return`<tr><td data-label="Persona"><span class="nm">${esc(nm)}</span></td><td data-label="Mes">${esc(mesLabel(pg.mes))}</td><td data-label="Monto"><span class="money">${fmtL(pg.monto)}</span></td><td data-label="Fecha">${esc(pg.fechaPago)}</td><td data-label="Acciones"><div class="acts"><button class="btn btn-sm" onclick="abrirEditarPago('${pg.id}')">✏</button><button class="btn btn-sm btn-danger" onclick="revertirPago('${pg.id}','${esc(nm)}',this)">↺</button></div></td></tr>`;}).join('')}</tbody></table>`;return;}
-  const lista=q?personas.filter(p=>p.nombre.toLowerCase().indexOf(q)!==-1):personas;const pm=DATA.pagos.filter(p=>p.mes===mes);const mapa={};pm.forEach(p=>{mapa[p.personaId]=p;});const rec=pm.reduce((s,p)=>s+(Number(p.monto)||0),0);
+    cont.innerHTML=`<table><thead><tr><th>Persona</th><th>Mes</th><th>Destino</th><th>Monto</th><th>Fecha</th><th></th></tr></thead><tbody>${pagos.map(pg=>{const per=DATA.personas.find(p=>p.id===pg.personaId);const nm=per?per.nombre:pg.personaId;return`<tr><td data-label="Persona"><span class="nm">${esc(nm)}</span></td><td data-label="Mes">${esc(mesLabel(pg.mes))}</td><td data-label="Destino">${pg.destino?'<span class="pill destino">'+esc(pg.destino)+'</span>':'—'}</td><td data-label="Monto"><span class="money">${fmtL(pg.monto)}</span></td><td data-label="Fecha">${esc(pg.fechaPago)}</td><td data-label="Acciones"><div class="acts"><button class="btn btn-sm" onclick="abrirEditarPago('${pg.id}')">✏</button><button class="btn btn-sm btn-danger" onclick="revertirPago('${pg.id}','${esc(nm)}',this)">↺</button></div></td></tr>`;}).join('')}</tbody></table>`;return;}
+  const lista=q?personas.filter(p=>p.nombre.toLowerCase().indexOf(q)!==-1):personas;let pm=DATA.pagos.filter(p=>p.mes===mes);if(destFiltro)pm=pm.filter(p=>p.destino===destFiltro);const mapa={};pm.forEach(p=>{mapa[p.personaId]=p;});const rec=pm.reduce((s,p)=>s+(Number(p.monto)||0),0);
   ce.innerHTML=[{n:pm.length+'/'+personas.length,l:'Pagaron',ic:'green',svg:'<path d="M20 6 9 17l-5-5"/>'},{n:Math.max(0,personas.length-pm.length),l:'Pendientes',ic:'amber',svg:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>'},{n:fmtL(rec),l:'Recaudado',ic:'slate',svg:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>'}].map(c=>`<div class="stat"><div class="ico ${c.ic}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${c.svg}</svg></div><div class="n">${c.n}</div><div class="l">${esc(c.l)}</div></div>`).join('');
   if(!lista.length){cont.innerHTML='<div class="tbl-empty">Sin resultados.</div>';return;}
-  cont.innerHTML=`<table><thead><tr><th>Persona</th><th>Estado</th><th>Monto</th><th>Fecha</th><th></th></tr></thead><tbody>${lista.map(per=>{const pg=mapa[per.id];const acc=pg?`<button class="btn btn-sm" onclick="abrirEditarPago('${pg.id}')">✏</button><button class="btn btn-sm btn-danger" onclick="revertirPago('${pg.id}','${esc(per.nombre)}',this)">↺</button>`:`<button class="btn btn-sm btn-primary" onclick="abrirMarcarPago('${per.id}','${mes}')">💲 Marcar</button>`;return`<tr><td data-label="Persona"><span class="nm">${esc(per.nombre)}</span></td><td data-label="Estado">${pg?'<span class="pill pago">Pagó</span>':'<span class="pill nopago">No pagó</span>'}</td><td data-label="Monto"><span class="money">${pg?fmtL(pg.monto):'—'}</span></td><td data-label="Fecha">${pg?esc(pg.fechaPago):'—'}</td><td data-label="Acciones"><div class="acts">${acc}</div></td></tr>`;}).join('')}</tbody></table>`;
+  cont.innerHTML=`<table><thead><tr><th>Persona</th><th>Estado</th><th>Destino</th><th>Monto</th><th>Fecha</th><th></th></tr></thead><tbody>${lista.map(per=>{const pg=mapa[per.id];const acc=pg?`<button class="btn btn-sm" onclick="abrirEditarPago('${pg.id}')">✏</button><button class="btn btn-sm btn-danger" onclick="revertirPago('${pg.id}','${esc(per.nombre)}',this)">↺</button>`:`<button class="btn btn-sm btn-primary" onclick="abrirMarcarPago('${per.id}','${mes}')">💲 Marcar</button>`;return`<tr><td data-label="Persona"><span class="nm">${esc(per.nombre)}</span></td><td data-label="Estado">${pg?'<span class="pill pago">Pagó</span>':'<span class="pill nopago">No pagó</span>'}</td><td data-label="Destino">${pg&&pg.destino?'<span class="pill destino">'+esc(pg.destino)+'</span>':'—'}</td><td data-label="Monto"><span class="money">${pg?fmtL(pg.monto):'—'}</span></td><td data-label="Fecha">${pg?esc(pg.fechaPago):'—'}</td><td data-label="Acciones"><div class="acts">${acc}</div></td></tr>`;}).join('')}</tbody></table>`;
 }
-['pag-mes','pag-busca'].forEach(id=>{const el=document.getElementById(id);el.addEventListener('change',pintarPagosTabla);el.addEventListener('input',pintarPagosTabla);});
+['pag-mes','pag-busca','pag-destino-filtro'].forEach(id=>{const el=document.getElementById(id);el.addEventListener('change',pintarPagosTabla);el.addEventListener('input',pintarPagosTabla);});
 function llenarSelectoresPago(pSel,mSel){const po=DATA.personas.slice().sort((a,b)=>a.nombre.localeCompare(b.nombre));document.getElementById('pago-persona').innerHTML=(pSel?'':'<option value="">— Elige persona —</option>')+po.map(p=>`<option value="${p.id}" ${pSel===p.id?'selected':''}>${esc(p.nombre)}</option>`).join('');const meses=listarMeses(DATA.config.mes_inicio,DATA.config.mes_fin);const mk=mesActual();const ms=mSel||(meses.indexOf(mk)>=0?mk:meses[meses.length-1]);document.getElementById('pago-mes-sel').innerHTML=meses.slice().reverse().map(m=>`<option value="${m}" ${ms===m?'selected':''}>${esc(mesLabel(m))}</option>`).join('');}
-function abrirNuevoPago(){if(!DATA.personas.length){toast('Primero agrega personas.','err');return;}editingPagoId=null;document.getElementById('pago-modal-title').textContent='Registrar nuevo pago';llenarSelectoresPago(null,null);document.getElementById('pago-persona').disabled=false;document.getElementById('pago-mes-sel').disabled=false;document.getElementById('pago-monto').value=DATA.config.monto_default||'200';document.getElementById('pago-fecha').value=hoyISO();abrir('ov-pago');$('#pago-persona').select2({dropdownParent:$('#ov-pago'),placeholder:'Buscar persona…',width:'100%'});setTimeout(()=>$('#pago-persona').select2('open'),100);}
-function abrirMarcarPago(personaId,mes){editingPagoId=null;document.getElementById('pago-modal-title').textContent='Marcar como pagado';llenarSelectoresPago(personaId,mes);document.getElementById('pago-persona').disabled=false;document.getElementById('pago-mes-sel').disabled=false;document.getElementById('pago-monto').value=DATA.config.monto_default||'200';document.getElementById('pago-fecha').value=hoyISO();abrir('ov-pago');if($.fn.select2&&$('#pago-persona').data('select2'))$('#pago-persona').select2('destroy');setTimeout(()=>document.getElementById('pago-monto').focus(),50);}
-function abrirEditarPago(pagoId){const pg=DATA.pagos.find(p=>p.id===pagoId);if(!pg)return;const per=DATA.personas.find(p=>p.id===pg.personaId);editingPagoId=pagoId;document.getElementById('pago-modal-title').textContent='Editar pago';document.getElementById('pago-persona').innerHTML=`<option value="${pg.personaId}">${esc(per?per.nombre:pg.personaId)}</option>`;document.getElementById('pago-persona').disabled=true;document.getElementById('pago-mes-sel').innerHTML=`<option value="${pg.mes}">${esc(mesLabel(pg.mes))}</option>`;document.getElementById('pago-mes-sel').disabled=true;document.getElementById('pago-monto').value=pg.monto;document.getElementById('pago-fecha').value=pg.fechaPago||hoyISO();abrir('ov-pago');if($.fn.select2&&$('#pago-persona').data('select2'))$('#pago-persona').select2('destroy');setTimeout(()=>document.getElementById('pago-monto').focus(),50);}
-document.getElementById('pago-save').addEventListener('click',async function(){const personaId=document.getElementById('pago-persona').value,mes=document.getElementById('pago-mes-sel').value,monto=parseFloat(document.getElementById('pago-monto').value),fechaPago=document.getElementById('pago-fecha').value;if(!editingPagoId&&!personaId){toast('Elige una persona.','err');return;}if(!editingPagoId&&!mes){toast('Elige un mes.','err');return;}if(isNaN(monto)||monto<0){toast('Monto inválido.','err');return;}setLoading(this,true);try{const res=editingPagoId?await api({action:'editar_pago',token:S.token,id:editingPagoId,monto,fechaPago}):await api({action:'registrar_pago',token:S.token,personaId,mes,monto,fechaPago});if(!res.ok)throw new Error(res.error);toast(editingPagoId?'Pago actualizado.':'Pago registrado.','ok');cerrar('ov-pago');await refrescar();pintarPagosTabla();}catch(e){toast(e.message,'err');}finally{setLoading(this,false);}});
+function abrirNuevoPago(){if(!DATA.personas.length){toast('Primero agrega personas.','err');return;}editingPagoId=null;document.getElementById('pago-modal-title').textContent='Registrar nuevo pago';llenarSelectoresPago(null,null);document.getElementById('pago-persona').disabled=false;document.getElementById('pago-mes-sel').disabled=false;llenarSelectDestino('pago-destino','');document.getElementById('pago-monto').value=DATA.config.monto_default||'200';document.getElementById('pago-fecha').value=hoyISO();abrir('ov-pago');$('#pago-persona').select2({dropdownParent:$('#ov-pago'),placeholder:'Buscar persona…',width:'100%'});setTimeout(()=>$('#pago-persona').select2('open'),100);}
+function abrirMarcarPago(personaId,mes){editingPagoId=null;document.getElementById('pago-modal-title').textContent='Marcar como pagado';llenarSelectoresPago(personaId,mes);document.getElementById('pago-persona').disabled=false;document.getElementById('pago-mes-sel').disabled=false;llenarSelectDestino('pago-destino','');document.getElementById('pago-monto').value=DATA.config.monto_default||'200';document.getElementById('pago-fecha').value=hoyISO();abrir('ov-pago');if($.fn.select2&&$('#pago-persona').data('select2'))$('#pago-persona').select2('destroy');setTimeout(()=>document.getElementById('pago-monto').focus(),50);}
+function abrirEditarPago(pagoId){const pg=DATA.pagos.find(p=>p.id===pagoId);if(!pg)return;const per=DATA.personas.find(p=>p.id===pg.personaId);editingPagoId=pagoId;document.getElementById('pago-modal-title').textContent='Editar pago';document.getElementById('pago-persona').innerHTML=`<option value="${pg.personaId}">${esc(per?per.nombre:pg.personaId)}</option>`;document.getElementById('pago-persona').disabled=true;document.getElementById('pago-mes-sel').innerHTML=`<option value="${pg.mes}">${esc(mesLabel(pg.mes))}</option>`;document.getElementById('pago-mes-sel').disabled=true;llenarSelectDestino('pago-destino',pg.destino||'');document.getElementById('pago-monto').value=pg.monto;document.getElementById('pago-fecha').value=pg.fechaPago||hoyISO();abrir('ov-pago');if($.fn.select2&&$('#pago-persona').data('select2'))$('#pago-persona').select2('destroy');setTimeout(()=>document.getElementById('pago-monto').focus(),50);}
+document.getElementById('pago-save').addEventListener('click',async function(){const personaId=document.getElementById('pago-persona').value,mes=document.getElementById('pago-mes-sel').value,monto=parseFloat(document.getElementById('pago-monto').value),fechaPago=document.getElementById('pago-fecha').value,destino=document.getElementById('pago-destino').value;if(!editingPagoId&&!personaId){toast('Elige una persona.','err');return;}if(!editingPagoId&&!mes){toast('Elige un mes.','err');return;}if(!destino){toast('Elige un destino.','err');return;}if(isNaN(monto)||monto<0){toast('Monto inválido.','err');return;}setLoading(this,true);try{const res=editingPagoId?await api({action:'editar_pago',token:S.token,id:editingPagoId,monto,fechaPago,destino}):await api({action:'registrar_pago',token:S.token,personaId,mes,monto,fechaPago,destino});if(!res.ok)throw new Error(res.error);toast(editingPagoId?'Pago actualizado.':'Pago registrado.','ok');cerrar('ov-pago');await refrescar();pintarPagosTabla();}catch(e){toast(e.message,'err');}finally{setLoading(this,false);}});
 async function revertirPago(pagoId,nombre,btn){const ok=await confirmar({titulo:'Revertir pago',msg:`¿Eliminar el pago de "${nombre}"?`,ok:'Sí, revertir',danger:true});if(!ok)return;setLoading(btn,true);try{const res=await api({action:'revertir_pago',token:S.token,id:pagoId});if(!res.ok)throw new Error(res.error);toast('Pago revertido.','ok');await refrescar();pintarPagosTabla();}catch(e){toast(e.message,'err');setLoading(btn,false);}}
 
 /* ════════ GASTOS ════════ */
@@ -538,12 +545,13 @@ function pintarGastos(){
     return`<tr>
       <td data-label="Fecha"><span class="mono">${esc(g.fecha)}</span></td>
       <td data-label="Detalle"><span class="nm">${esc(g.motivo||'(sin descripción)')}</span>${facLabel}${itemsHtml}</td>
+      <td data-label="Destino">${g.destino?'<span class="pill destino">'+esc(g.destino)+'</span>':'—'}</td>
       <td data-label="Monto"><span class="money" style="color:var(--red-text)">- ${fmtL(g.monto)}</span></td>
       <td data-label="Registrado por">${esc(g.registradoPor)}</td>
       ${isAdmin?`<td data-label="Acciones">${acc}</td>`:''}
     </tr>`;
   }).join('');
-  cont.innerHTML=`<table><thead><tr><th>Fecha</th><th>Detalle</th><th>Monto</th><th>Registrado por</th>${isAdmin?'<th></th>':''}</tr></thead><tbody>${filas}</tbody></table>`;
+  cont.innerHTML=`<table><thead><tr><th>Fecha</th><th>Detalle</th><th>Destino</th><th>Monto</th><th>Registrado por</th>${isAdmin?'<th></th>':''}</tr></thead><tbody>${filas}</tbody></table>`;
 }
 
 /* Items dinámicos del modal gasto */
@@ -576,6 +584,7 @@ function abrirGasto(id){
   document.getElementById('gas-numfac').value='';
   document.getElementById('gas-motivo').value='';
   document.getElementById('gas-fecha').value=hoyISO();
+  llenarSelectDestino('gas-destino','');
   gastoItems=[{nombre:'',cantidad:1,precio:0}];
   if(id){
     const g=DATA.gastos.find(x=>x.id===id);
@@ -583,6 +592,7 @@ function abrirGasto(id){
       document.getElementById('gas-numfac').value=g.numFactura||'';
       document.getElementById('gas-motivo').value=g.motivo||'';
       document.getElementById('gas-fecha').value=g.fecha||hoyISO();
+      llenarSelectDestino('gas-destino',g.destino||'');
       gastoItems=(g.items&&g.items.length)?g.items.map(it=>({nombre:it.nombre||'',cantidad:Number(it.cantidad)||1,precio:Number(it.precio)||0})):[{nombre:'',cantidad:1,precio:0}];
     }
   }
@@ -594,18 +604,18 @@ document.getElementById('gas-save').addEventListener('click',async function(){
   const motivo=document.getElementById('gas-motivo').value.trim();
   const numFactura=document.getElementById('gas-numfac').value.trim();
   const fecha=document.getElementById('gas-fecha').value;
-  // Limpiar items vacíos
+  const destino=document.getElementById('gas-destino').value;
+  if(!destino){toast('Elige un destino.','err');return;}
   const items=gastoItems.filter(it=>it.nombre.trim()||(it.precio>0&&it.cantidad>0)).map(it=>({nombre:it.nombre,cantidad:Number(it.cantidad)||1,precio:Number(it.precio)||0}));
   if(!items.length){toast('Agrega al menos un artículo con nombre o precio.','err');return;}
-  // Validar que cada item tenga nombre
   for(let i=0;i<items.length;i++){if(!items[i].nombre.trim()){toast('El artículo #'+(i+1)+' no tiene nombre.','err');return;}}
   const total=items.reduce((s,it)=>s+(Number(it.cantidad)||1)*(Number(it.precio)||0),0);
   if(total<=0){toast('El total debe ser mayor a 0.','err');return;}
   setLoading(this,true);
   try{
     const params=editingGastoId
-      ?{action:'editar_gasto',token:S.token,id:editingGastoId,motivo,numFactura,items:JSON.stringify(items),fecha}
-      :{action:'crear_gasto',token:S.token,motivo,numFactura,items:JSON.stringify(items),fecha};
+      ?{action:'editar_gasto',token:S.token,id:editingGastoId,motivo,numFactura,items:JSON.stringify(items),fecha,destino}
+      :{action:'crear_gasto',token:S.token,motivo,numFactura,items:JSON.stringify(items),fecha,destino};
     const res=await api(params);if(!res.ok)throw new Error(res.error);
     toast(editingGastoId?'Gasto actualizado.':'Gasto registrado.','ok');cerrar('ov-gasto');await refrescar();pintarGastos();
   }catch(e){toast(e.message,'err');}finally{setLoading(this,false);}
@@ -613,31 +623,40 @@ document.getElementById('gas-save').addEventListener('click',async function(){
 async function borrarGasto(id,btn){const g=DATA.gastos.find(x=>x.id===id);const ok=await confirmar({titulo:'Borrar gasto',msg:`¿Borrar el gasto "${(g&&g.motivo)||id}"?`,ok:'Sí, borrar',danger:true});if(!ok)return;setLoading(btn,true);try{const res=await api({action:'borrar_gasto',token:S.token,id});if(!res.ok)throw new Error(res.error);toast('Gasto borrado.','ok');await refrescar();pintarGastos();}catch(e){toast(e.message,'err');setLoading(btn,false);}}
 
 /* REPORTES */
-function pintarReportesFiltros(){const meses=listarMeses(DATA.config.mes_inicio,DATA.config.mes_fin);const sM=document.getElementById('rep-mes'),sP=document.getElementById('rep-persona');const pM=sM.value,pP=sP.value;sM.innerHTML='<option value="">Todos los meses</option>'+meses.slice().reverse().map(m=>`<option value="${m}">${esc(mesLabel(m))}</option>`).join('');sP.innerHTML='<option value="">Todas las personas</option>'+DATA.personas.slice().sort((a,b)=>a.nombre.localeCompare(b.nombre)).map(p=>`<option value="${p.id}">${esc(p.nombre)}</option>`).join('');if(pM)sM.value=pM;if(pP)sP.value=pP;}
-function calcularReporte(){const mes=document.getElementById('rep-mes').value,personaId=document.getElementById('rep-persona').value,estado=document.getElementById('rep-estado').value,isUser=S.sesion.rol!=='admin',fp=isUser?S.sesion.personaId:'';const filas=[];
-  if(mes){let pers=DATA.personas;if(personaId)pers=pers.filter(p=>p.id===personaId);if(fp)pers=pers.filter(p=>p.id===fp);pers=pers.slice().sort((a,b)=>a.nombre.localeCompare(b.nombre));pers.forEach(per=>{const pg=DATA.pagos.find(x=>x.personaId===per.id&&x.mes===mes);const pago=pg?'pago':'nopago';if(estado&&estado!==pago)return;filas.push({personaId:per.id,nombre:per.nombre,mes,estado:pg?'Pagó':'No pagó',monto:pg?Number(pg.monto)||0:0,fechaPago:pg?pg.fechaPago:'',registradoPor:pg?pg.registradoPor:'',pagoId:pg?pg.id:''});});}
-  else{let pagos=DATA.pagos.slice();if(personaId)pagos=pagos.filter(p=>p.personaId===personaId);if(fp)pagos=pagos.filter(p=>p.personaId===fp);if(estado==='nopago')pagos=[];pagos.sort((a,b)=>(b.mes||'').localeCompare(a.mes||'')||a.personaId.localeCompare(b.personaId));pagos.forEach(pg=>{const per=DATA.personas.find(p=>p.id===pg.personaId);filas.push({personaId:pg.personaId,nombre:per?per.nombre:pg.personaId,mes:pg.mes,estado:'Pagó',monto:Number(pg.monto)||0,fechaPago:pg.fechaPago,registradoPor:pg.registradoPor,pagoId:pg.id});});}
-  return filas;}
+function pintarReportesFiltros(){
+  const meses=listarMeses(DATA.config.mes_inicio,DATA.config.mes_fin);
+  const sM=document.getElementById('rep-mes'),sP=document.getElementById('rep-persona'),sD=document.getElementById('rep-destino');
+  const pM=sM.value,pP=sP.value,pD=sD.value;
+  sM.innerHTML='<option value="">Todos los meses</option>'+meses.slice().reverse().map(m=>`<option value="${m}">${esc(mesLabel(m))}</option>`).join('');
+  sP.innerHTML='<option value="">Todas las personas</option>'+DATA.personas.slice().sort((a,b)=>a.nombre.localeCompare(b.nombre)).map(p=>`<option value="${p.id}">${esc(p.nombre)}</option>`).join('');
+  sD.innerHTML='<option value="">Todos los destinos</option>'+DATA.destinos.map(d=>`<option value="${esc(d)}">${esc(d)}</option>`).join('');
+  if(pM)sM.value=pM;if(pP)sP.value=pP;if(pD)sD.value=pD;
+}
+function calcularReporte(){
+  const mes=document.getElementById('rep-mes').value,personaId=document.getElementById('rep-persona').value,estado=document.getElementById('rep-estado').value,destFiltro=document.getElementById('rep-destino').value,isUser=S.sesion.rol!=='admin',fp=isUser?S.sesion.personaId:'';const filas=[];
+  if(mes){let pers=DATA.personas;if(personaId)pers=pers.filter(p=>p.id===personaId);if(fp)pers=pers.filter(p=>p.id===fp);pers=pers.slice().sort((a,b)=>a.nombre.localeCompare(b.nombre));pers.forEach(per=>{let pagosPersona=DATA.pagos.filter(x=>x.personaId===per.id&&x.mes===mes);if(destFiltro)pagosPersona=pagosPersona.filter(x=>x.destino===destFiltro);const pg=pagosPersona[0];const pago=pg?'pago':'nopago';if(estado&&estado!==pago)return;filas.push({personaId:per.id,nombre:per.nombre,mes,estado:pg?'Pagó':'No pagó',monto:pg?Number(pg.monto)||0:0,fechaPago:pg?pg.fechaPago:'',destino:pg?pg.destino||'':'',registradoPor:pg?pg.registradoPor:'',pagoId:pg?pg.id:''});});}
+  else{let pagos=DATA.pagos.slice();if(personaId)pagos=pagos.filter(p=>p.personaId===personaId);if(fp)pagos=pagos.filter(p=>p.personaId===fp);if(destFiltro)pagos=pagos.filter(p=>p.destino===destFiltro);if(estado==='nopago')pagos=[];pagos.sort((a,b)=>(b.mes||'').localeCompare(a.mes||'')||a.personaId.localeCompare(b.personaId));pagos.forEach(pg=>{const per=DATA.personas.find(p=>p.id===pg.personaId);filas.push({personaId:pg.personaId,nombre:per?per.nombre:pg.personaId,mes:pg.mes,estado:'Pagó',monto:Number(pg.monto)||0,fechaPago:pg.fechaPago,destino:pg.destino||'',registradoPor:pg.registradoPor,pagoId:pg.id});});}
+  return filas;
+}
 function pintarReportes(){const filas=calcularReporte(),pagos=filas.filter(f=>f.estado==='Pagó'),noPagos=filas.filter(f=>f.estado==='No pagó'),monto=pagos.reduce((s,f)=>s+(Number(f.monto)||0),0);
   document.getElementById('rep-cards').innerHTML=[{n:filas.length,l:'Registros',ic:'blue',svg:'<path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/>'},{n:pagos.length,l:'Pagos',ic:'green',svg:'<path d="M20 6 9 17l-5-5"/>'},{n:noPagos.length,l:'No pagaron',ic:'amber',svg:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>'},{n:fmtL(monto),l:'Total recaudado (filtrado)',ic:'slate',svg:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>'}].map(c=>`<div class="stat"><div class="ico ${c.ic}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${c.svg}</svg></div><div class="n">${c.n}</div><div class="l">${esc(c.l)}</div></div>`).join('');
   const cont=document.getElementById('tbl-reportes');if(!filas.length){cont.innerHTML='<div class="tbl-empty">Sin registros que coincidan.</div>';return;}
-  cont.innerHTML=`<table><thead><tr><th>Persona</th><th>Mes</th><th>Estado</th><th>Monto</th><th>Fecha</th><th>Registrado por</th></tr></thead><tbody>${filas.map(f=>`<tr><td data-label="Persona"><span class="nm">${esc(f.nombre)}</span></td><td data-label="Mes">${esc(mesLabel(f.mes))}</td><td data-label="Estado">${f.estado==='Pagó'?'<span class="pill pago">Pagó</span>':'<span class="pill nopago">No pagó</span>'}</td><td data-label="Monto"><span class="money">${f.monto?fmtL(f.monto):'—'}</span></td><td data-label="Fecha">${esc(f.fechaPago||'—')}</td><td data-label="Registrado">${esc(f.registradoPor||'—')}</td></tr>`).join('')}</tbody></table>`;}
-['rep-mes','rep-persona','rep-estado'].forEach(id=>document.getElementById(id).addEventListener('change',pintarReportes));
+  cont.innerHTML=`<table><thead><tr><th>Persona</th><th>Mes</th><th>Estado</th><th>Destino</th><th>Monto</th><th>Fecha</th><th>Registrado por</th></tr></thead><tbody>${filas.map(f=>`<tr><td data-label="Persona"><span class="nm">${esc(f.nombre)}</span></td><td data-label="Mes">${esc(mesLabel(f.mes))}</td><td data-label="Estado">${f.estado==='Pagó'?'<span class="pill pago">Pagó</span>':'<span class="pill nopago">No pagó</span>'}</td><td data-label="Destino">${f.destino?'<span class="pill destino">'+esc(f.destino)+'</span>':'—'}</td><td data-label="Monto"><span class="money">${f.monto?fmtL(f.monto):'—'}</span></td><td data-label="Fecha">${esc(f.fechaPago||'—')}</td><td data-label="Registrado">${esc(f.registradoPor||'—')}</td></tr>`).join('')}</tbody></table>`;}
+['rep-mes','rep-persona','rep-estado','rep-destino'].forEach(id=>document.getElementById(id).addEventListener('change',pintarReportes));
 
 function exportarExcel(){
   if(typeof XLSX==='undefined'){toast('No se pudo cargar el exportador.','err');return;}const filas=calcularReporte();if(!filas.length){toast('No hay datos.','err');return;}
-  const ws1=XLSX.utils.json_to_sheet(filas.map(f=>({'Persona':f.nombre,'Mes':mesLabel(f.mes),'Estado':f.estado,'Monto':f.monto,'Fecha de pago':f.fechaPago||'','Registrado por':f.registradoPor||''})));ws1['!cols']=[{wch:28},{wch:14},{wch:10},{wch:12},{wch:14},{wch:18}];
+  const ws1=XLSX.utils.json_to_sheet(filas.map(f=>({'Persona':f.nombre,'Mes':mesLabel(f.mes),'Estado':f.estado,'Destino':f.destino||'','Monto':f.monto,'Fecha de pago':f.fechaPago||'','Registrado por':f.registradoPor||''})));ws1['!cols']=[{wch:28},{wch:14},{wch:10},{wch:22},{wch:12},{wch:14},{wch:18}];
   const porMes={};filas.forEach(f=>{if(!porMes[f.mes])porMes[f.mes]={pagos:0,total:0};if(f.estado==='Pagó'){porMes[f.mes].pagos++;porMes[f.mes].total+=Number(f.monto)||0;}});
   const ws2=XLSX.utils.json_to_sheet(Object.keys(porMes).sort().map(m=>({'Mes':mesLabel(m),'Pagos':porMes[m].pagos,'Total recaudado':porMes[m].total})));ws2['!cols']=[{wch:18},{wch:10},{wch:16}];
   const porPer={};filas.forEach(f=>{if(!porPer[f.nombre])porPer[f.nombre]={pagos:0,total:0};if(f.estado==='Pagó'){porPer[f.nombre].pagos++;porPer[f.nombre].total+=Number(f.monto)||0;}});
   const ws3=XLSX.utils.json_to_sheet(Object.keys(porPer).sort().map(n=>({'Persona':n,'Pagos realizados':porPer[n].pagos,'Total aportado':porPer[n].total})));ws3['!cols']=[{wch:28},{wch:18},{wch:16}];
   const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws1,'Detalle');XLSX.utils.book_append_sheet(wb,ws2,'Por mes');XLSX.utils.book_append_sheet(wb,ws3,'Por persona');
-  // Gastos con detalle de artículos
   const gastosFilas=[];(DATA.gastos||[]).slice().sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||'')).forEach(g=>{
-    const items=g.items||[];if(items.length){items.forEach(it=>{gastosFilas.push({'Fecha':g.fecha,'Factura':g.numFactura||'','Motivo':g.motivo||'','Artículo':it.nombre,'Precio':Number(it.precio)||0,'Total gasto':g.monto,'Registrado por':g.registradoPor});});}
-    else{gastosFilas.push({'Fecha':g.fecha,'Factura':g.numFactura||'','Motivo':g.motivo||'','Artículo':'','Precio':g.monto,'Total gasto':g.monto,'Registrado por':g.registradoPor});}
+    const items=g.items||[];if(items.length){items.forEach(it=>{gastosFilas.push({'Fecha':g.fecha,'Factura':g.numFactura||'','Motivo':g.motivo||'','Destino':g.destino||'','Artículo':it.nombre,'Precio':Number(it.precio)||0,'Total gasto':g.monto,'Registrado por':g.registradoPor});});}
+    else{gastosFilas.push({'Fecha':g.fecha,'Factura':g.numFactura||'','Motivo':g.motivo||'','Destino':g.destino||'','Artículo':'','Precio':g.monto,'Total gasto':g.monto,'Registrado por':g.registradoPor});}
   });
-  const ws4=XLSX.utils.json_to_sheet(gastosFilas.length?gastosFilas:[{'Fecha':'(sin gastos)'}]);ws4['!cols']=[{wch:12},{wch:12},{wch:30},{wch:28},{wch:12},{wch:14},{wch:18}];
+  const ws4=XLSX.utils.json_to_sheet(gastosFilas.length?gastosFilas:[{'Fecha':'(sin gastos)'}]);ws4['!cols']=[{wch:12},{wch:12},{wch:30},{wch:22},{wch:28},{wch:12},{wch:14},{wch:18}];
   XLSX.utils.book_append_sheet(wb,ws4,'Gastos');
   const tI=DATA.pagos.reduce((s,p)=>s+(Number(p.monto)||0),0),tG=(DATA.gastos||[]).reduce((s,g)=>s+(Number(g.monto)||0),0);
   const ws5=XLSX.utils.json_to_sheet([{'Concepto':'Total aportes (ingresos)','Monto (L.)':tI},{'Concepto':'Total gastos (salidas)','Monto (L.)':-tG},{'Concepto':'SALDO ACTUAL','Monto (L.)':tI-tG}]);ws5['!cols']=[{wch:30},{wch:14}];
