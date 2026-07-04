@@ -174,8 +174,11 @@
   /* Items list in gasto modal */
   .items-list{margin-bottom:10px}
   .item-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
-  .item-row input:first-child{flex:1;min-width:0}
-  .item-row input:nth-child(2){width:120px}
+  .item-row{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+  .item-row .item-nombre{flex:1;min-width:120px}
+  .item-row .item-cant{width:70px}
+  .item-row .item-precio{width:100px}
+  .item-row .item-sub{width:100px;font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--text-dim);text-align:right;white-space:nowrap;padding:11px 4px}
   .item-row input{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px 13px;font-size:.94rem;color:var(--text);font-family:inherit}
   .item-row input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
   .btn-add-item{width:100%;border:2px dashed var(--border);background:var(--soft);color:var(--primary);border-radius:10px;padding:11px;font-size:.9rem;font-weight:600;cursor:pointer;transition:.14s;margin-bottom:10px}
@@ -352,7 +355,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbw1wiF5Q-TNapgfXUgRO7ekUYGVEF9KtsjTGQpRjQrLOHgXuRWrd21C_Vwa7eNCIvF_rw/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwC4QxkUVBFdjusJiQPZ9ubnpFvKZH9YVSMWDuiB8BiLAzgQ-3zMYiD0LeJqNMImo_UEg/exec";
 
 const MESES_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const _mem = {};
@@ -529,7 +532,7 @@ function pintarGastos(){
   const lista=DATA.gastos.slice().sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''));
   const filas=lista.map(g=>{
     const items=(g.items||[]);
-    const itemsHtml=items.length?`<div class="items-detail">${items.map(it=>`<div class="item-line"><span class="iname">${esc(it.nombre)}</span><span class="iprice">${fmtL(it.precio)}</span></div>`).join('')}</div>`:'';
+    const itemsHtml=items.length?`<div class="items-detail">${items.map(it=>{const c=Number(it.cantidad)||1;const sub=c*(Number(it.precio)||0);return`<div class="item-line"><span class="iname">${esc(it.nombre)} × ${c}</span><span class="iprice">${fmtL(sub)}</span></div>`;}).join('')}</div>`:'';
     const facLabel=g.numFactura?`<div class="mono" style="margin-top:2px">Factura: ${esc(g.numFactura)}</div>`:'';
     const acc=isAdmin?`<div class="acts"><button class="btn btn-sm" onclick="abrirGasto('${g.id}')">✏ Editar</button><button class="btn btn-sm btn-danger" onclick="borrarGasto('${g.id}',this)">Borrar</button></div>`:'';
     return`<tr>
@@ -547,29 +550,40 @@ function pintarGastos(){
 let gastoItems = [];
 function renderItemsGasto(){
   const cont=document.getElementById('gas-items');
-  cont.innerHTML=gastoItems.map((it,i)=>`<div class="item-row">
-    <input type="text" placeholder="Artículo" value="${esc(it.nombre)}" onchange="gastoItems[${i}].nombre=this.value">
-    <input type="number" placeholder="Precio" min="0" step="0.01" inputmode="decimal" value="${it.precio||''}" onchange="gastoItems[${i}].precio=parseFloat(this.value)||0;actualizarTotalGasto()">
-    <button class="item-del" onclick="gastoItems.splice(${i},1);renderItemsGasto();actualizarTotalGasto()" title="Quitar">&times;</button>
-  </div>`).join('');
+  cont.innerHTML=gastoItems.map((it,i)=>{
+    const sub=(Number(it.cantidad)||0)*(Number(it.precio)||0);
+    return`<div class="item-row">
+      <input class="item-nombre" type="text" placeholder="Artículo" value="${esc(it.nombre)}" onchange="gastoItems[${i}].nombre=this.value">
+      <input class="item-cant" type="number" placeholder="Cant." min="0" step="1" value="${it.cantidad||''}" onchange="gastoItems[${i}].cantidad=parseFloat(this.value)||0;actualizarTotalGasto()">
+      <input class="item-precio" type="number" placeholder="Precio" min="0" step="0.01" inputmode="decimal" value="${it.precio||''}" onchange="gastoItems[${i}].precio=parseFloat(this.value)||0;actualizarTotalGasto()">
+      <span class="item-sub">${fmtL(sub)}</span>
+      <button class="item-del" onclick="gastoItems.splice(${i},1);renderItemsGasto();actualizarTotalGasto()" title="Quitar">&times;</button>
+    </div>`;
+  }).join('');
 }
-function agregarItemGasto(){gastoItems.push({nombre:'',precio:0});renderItemsGasto();const rows=document.querySelectorAll('#gas-items .item-row');if(rows.length)rows[rows.length-1].querySelector('input').focus();}
-function actualizarTotalGasto(){const total=gastoItems.reduce((s,it)=>s+(Number(it.precio)||0),0);document.getElementById('gas-total').textContent=fmtL(total);}
-
+function agregarItemGasto(){gastoItems.push({nombre:'',cantidad:1,precio:0});renderItemsGasto();const rows=document.querySelectorAll('#gas-items .item-row');if(rows.length)rows[rows.length-1].querySelector('input').focus();}
+function actualizarTotalGasto(){
+  const total=gastoItems.reduce((s,it)=>s+(Number(it.cantidad)||0)*(Number(it.precio)||0),0);
+  document.getElementById('gas-total').textContent=fmtL(total);
+  document.querySelectorAll('#gas-items .item-row').forEach((row,i)=>{
+    const sub=(Number(gastoItems[i].cantidad)||0)*(Number(gastoItems[i].precio)||0);
+    row.querySelector('.item-sub').textContent=fmtL(sub);
+  });
+}
 function abrirGasto(id){
   editingGastoId=id||null;
   document.getElementById('gas-modal-title').textContent=id?'Editar gasto':'Nuevo gasto';
   document.getElementById('gas-numfac').value='';
   document.getElementById('gas-motivo').value='';
   document.getElementById('gas-fecha').value=hoyISO();
-  gastoItems=[{nombre:'',precio:0}];
+  gastoItems=[{nombre:'',cantidad:1,precio:0}];
   if(id){
     const g=DATA.gastos.find(x=>x.id===id);
     if(g){
       document.getElementById('gas-numfac').value=g.numFactura||'';
       document.getElementById('gas-motivo').value=g.motivo||'';
       document.getElementById('gas-fecha').value=g.fecha||hoyISO();
-      gastoItems=(g.items&&g.items.length)?g.items.map(it=>({nombre:it.nombre||'',precio:Number(it.precio)||0})):[{nombre:'',precio:0}];
+      gastoItems=(g.items&&g.items.length)?g.items.map(it=>({nombre:it.nombre||'',cantidad:Number(it.cantidad)||1,precio:Number(it.precio)||0})):[{nombre:'',cantidad:1,precio:0}];
     }
   }
   renderItemsGasto();actualizarTotalGasto();
@@ -581,11 +595,11 @@ document.getElementById('gas-save').addEventListener('click',async function(){
   const numFactura=document.getElementById('gas-numfac').value.trim();
   const fecha=document.getElementById('gas-fecha').value;
   // Limpiar items vacíos
-  const items=gastoItems.filter(it=>it.nombre.trim()||it.precio>0);
+  const items=gastoItems.filter(it=>it.nombre.trim()||(it.precio>0&&it.cantidad>0)).map(it=>({nombre:it.nombre,cantidad:Number(it.cantidad)||1,precio:Number(it.precio)||0}));
   if(!items.length){toast('Agrega al menos un artículo con nombre o precio.','err');return;}
   // Validar que cada item tenga nombre
   for(let i=0;i<items.length;i++){if(!items[i].nombre.trim()){toast('El artículo #'+(i+1)+' no tiene nombre.','err');return;}}
-  const total=items.reduce((s,it)=>s+(Number(it.precio)||0),0);
+  const total=items.reduce((s,it)=>s+(Number(it.cantidad)||1)*(Number(it.precio)||0),0);
   if(total<=0){toast('El total debe ser mayor a 0.','err');return;}
   setLoading(this,true);
   try{
