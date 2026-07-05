@@ -284,7 +284,9 @@
       </section>
       <section class="view" id="v-gastos">
         <div class="sect-h"><div class="sh-left"><div class="page-title" id="gas-titulo">Gastos</div><div class="page-sub" id="gas-sub">Salidas del fondo: compras, materiales, etc.</div></div><div class="sh-right" id="gas-acciones"></div></div>
-        <div class="cards" id="gas-cards"></div><div class="tbl-wrap" id="tbl-gastos"></div>
+        <div class="cards" id="gas-cards"></div>
+        <div class="toolbar"><label style="font-size:.85rem;color:var(--text-dim);font-weight:500">Destino:</label><select id="gas-destino-filtro"><option value="">Todos</option></select></div>
+        <div class="tbl-wrap" id="tbl-gastos"></div>
       </section>
       <section class="view" id="v-reportes">
         <div class="page-title">Reportes</div><div class="page-sub">Filtra por mes o por persona y exporta a Excel.</div>
@@ -441,7 +443,7 @@ function irA(v){
   const t={dashboard:'Dashboard','mi-estado':'Mi estado',personas:'Personas',pagos:'Pagos por mes',gastos:'Gastos',reportes:'Reportes',usuarios:'Usuarios',config:'Configuración',ayuda:'Ayuda'};
   document.getElementById('tb-title').textContent=t[v]||'';document.getElementById('sidebar').classList.remove('open');
   if(v==='dashboard')pintarDashboard();if(v==='mi-estado')pintarMiEstado();if(v==='personas')pintarPersonas();
-  if(v==='pagos'){pintarPagosMesSelect();pintarPagosDestinoFiltro();pintarPagosTabla();}if(v==='gastos')pintarGastos();
+  if(v==='pagos'){pintarPagosMesSelect();pintarPagosDestinoFiltro();pintarPagosTabla();}if(v==='gastos'){pintarGastosDestinoFiltro();pintarGastos();}
   if(v==='reportes'){pintarReportesFiltros();pintarReportes();}if(v==='usuarios')pintarUsuarios();if(v==='config')pintarConfig();
 }
 document.getElementById('menu-btn').addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('open'));
@@ -526,17 +528,25 @@ document.getElementById('pago-save').addEventListener('click',async function(){c
 async function revertirPago(pagoId,nombre,btn){const ok=await confirmar({titulo:'Revertir pago',msg:`¿Eliminar el pago de "${nombre}"?`,ok:'Sí, revertir',danger:true});if(!ok)return;setLoading(btn,true);try{const res=await api({action:'revertir_pago',token:S.token,id:pagoId});if(!res.ok)throw new Error(res.error);toast('Pago revertido.','ok');await refrescar();pintarPagosTabla();}catch(e){toast(e.message,'err');setLoading(btn,false);}}
 
 /* ════════ GASTOS ════════ */
+function pintarGastosDestinoFiltro(){const sel=document.getElementById('gas-destino-filtro');const prev=sel.value;sel.innerHTML='<option value="">Todos</option>'+DATA.destinos.map(d=>`<option value="${esc(d)}">${esc(d)}</option>`).join('');if(prev)sel.value=prev;}
+document.getElementById('gas-destino-filtro').addEventListener('change',pintarGastos);
 function pintarGastos(){
   const isAdmin=S.sesion.rol==='admin';
+  const destFiltro=(document.getElementById('gas-destino-filtro')||{}).value||'';
   const totalIng=DATA.pagos.reduce((s,p)=>s+(Number(p.monto)||0),0),totalGas=(DATA.gastos||[]).reduce((s,g)=>s+(Number(g.monto)||0),0),saldo=totalIng-totalGas;
   document.getElementById('gas-titulo').textContent=isAdmin?'Gastos':'Gastos del grupo';
   document.getElementById('gas-sub').textContent=isAdmin?'Salidas del fondo. Se descuentan del total recaudado.':'Registro de gastos del fondo común.';
   document.getElementById('gas-acciones').innerHTML=isAdmin?'<button class="btn btn-primary" onclick="abrirGasto()">+ Nuevo gasto</button>':'';
-  const cards=[{n:fmtL(totalIng),l:'Total aportes',ic:'green',svg:'<path d="M12 19V5M5 12l7-7 7 7"/>'},{n:fmtL(totalGas),l:'Total gastos',ic:'red',svg:'<path d="M12 5v14M5 12l7 7 7-7"/>'},{n:fmtL(saldo),l:'Saldo actual',ic:saldo>=0?'blue':'amber',svg:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>'}];
+  let gastosFiltrados=(DATA.gastos||[]).slice();
+  if(destFiltro)gastosFiltrados=gastosFiltrados.filter(g=>g.destino===destFiltro);
+  const totalGasFiltrado=gastosFiltrados.reduce((s,g)=>s+(Number(g.monto)||0),0);
+  const cards=destFiltro
+    ?[{n:gastosFiltrados.length,l:'Gastos ('+destFiltro+')',ic:'red',svg:'<path d="M12 5v14M5 12l7 7 7-7"/>'},{n:fmtL(totalGasFiltrado),l:'Total filtrado',ic:'slate',svg:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>'}]
+    :[{n:fmtL(totalIng),l:'Total aportes',ic:'green',svg:'<path d="M12 19V5M5 12l7-7 7 7"/>'},{n:fmtL(totalGas),l:'Total gastos',ic:'red',svg:'<path d="M12 5v14M5 12l7 7 7-7"/>'},{n:fmtL(saldo),l:'Saldo actual',ic:saldo>=0?'blue':'amber',svg:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>'}];
   document.getElementById('gas-cards').innerHTML=cards.map(c=>`<div class="stat"><div class="ico ${c.ic}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${c.svg}</svg></div><div class="n">${c.n}</div><div class="l">${esc(c.l)}</div></div>`).join('');
   const cont=document.getElementById('tbl-gastos');
-  if(!(DATA.gastos||[]).length){cont.innerHTML='<div class="tbl-empty">No hay gastos registrados todavía.</div>';return;}
-  const lista=DATA.gastos.slice().sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''));
+  if(!gastosFiltrados.length){cont.innerHTML='<div class="tbl-empty">No hay gastos'+(destFiltro?' para "'+esc(destFiltro)+'"':' registrados todavía')+'.</div>';return;}
+  const lista=gastosFiltrados.sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''));
   const filas=lista.map(g=>{
     const items=(g.items||[]);
     const itemsHtml=items.length?`<div class="items-detail">${items.map(it=>{const c=Number(it.cantidad)||1;const sub=c*(Number(it.precio)||0);return`<div class="item-line"><span class="iname">${esc(it.nombre)} × ${c}</span><span class="iprice">${fmtL(sub)}</span></div>`;}).join('')}</div>`:'';
