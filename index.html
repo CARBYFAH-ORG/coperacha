@@ -533,16 +533,18 @@ document.getElementById('gas-destino-filtro').addEventListener('change',pintarGa
 function pintarGastos(){
   const isAdmin=S.sesion.rol==='admin';
   const destFiltro=(document.getElementById('gas-destino-filtro')||{}).value||'';
-  const totalIng=DATA.pagos.reduce((s,p)=>s+(Number(p.monto)||0),0),totalGas=(DATA.gastos||[]).reduce((s,g)=>s+(Number(g.monto)||0),0),saldo=totalIng-totalGas;
   document.getElementById('gas-titulo').textContent=isAdmin?'Gastos':'Gastos del grupo';
-  document.getElementById('gas-sub').textContent=isAdmin?'Salidas del fondo. Se descuentan del total recaudado.':'Registro de gastos del fondo común.';
+  document.getElementById('gas-sub').textContent=isAdmin?(destFiltro?'Resumen de "'+destFiltro+'" — aportes vs gastos.':'Salidas del fondo. Se descuentan del total recaudado.'):'Registro de gastos del fondo común.';
   document.getElementById('gas-acciones').innerHTML=isAdmin?'<button class="btn btn-primary" onclick="abrirGasto()">+ Nuevo gasto</button>':'';
   let gastosFiltrados=(DATA.gastos||[]).slice();
   if(destFiltro)gastosFiltrados=gastosFiltrados.filter(g=>g.destino===destFiltro);
-  const totalGasFiltrado=gastosFiltrados.reduce((s,g)=>s+(Number(g.monto)||0),0);
-  const cards=destFiltro
-    ?[{n:gastosFiltrados.length,l:'Gastos ('+destFiltro+')',ic:'red',svg:'<path d="M12 5v14M5 12l7 7 7-7"/>'},{n:fmtL(totalGasFiltrado),l:'Total filtrado',ic:'slate',svg:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>'}]
-    :[{n:fmtL(totalIng),l:'Total aportes',ic:'green',svg:'<path d="M12 19V5M5 12l7-7 7 7"/>'},{n:fmtL(totalGas),l:'Total gastos',ic:'red',svg:'<path d="M12 5v14M5 12l7 7 7-7"/>'},{n:fmtL(saldo),l:'Saldo actual',ic:saldo>=0?'blue':'amber',svg:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>'}];
+  const ingFiltro=destFiltro?DATA.pagos.filter(p=>p.destino===destFiltro).reduce((s,p)=>s+(Number(p.monto)||0),0):DATA.pagos.reduce((s,p)=>s+(Number(p.monto)||0),0);
+  const gasFiltro=gastosFiltrados.reduce((s,g)=>s+(Number(g.monto)||0),0);
+  const saldoFiltro=ingFiltro-gasFiltro;
+  const lblAportes=destFiltro?'Aportes · '+destFiltro:'Total aportes';
+  const lblGastos=destFiltro?'Gastos · '+destFiltro:'Total gastos';
+  const lblSaldo=destFiltro?'Saldo · '+destFiltro:'Saldo actual';
+  const cards=[{n:fmtL(ingFiltro),l:lblAportes,ic:'green',svg:'<path d="M12 19V5M5 12l7-7 7 7"/>'},{n:fmtL(gasFiltro),l:lblGastos,ic:'red',svg:'<path d="M12 5v14M5 12l7 7 7-7"/>'},{n:fmtL(saldoFiltro),l:lblSaldo,ic:saldoFiltro>=0?'blue':'amber',svg:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>'}];
   document.getElementById('gas-cards').innerHTML=cards.map(c=>`<div class="stat"><div class="ico ${c.ic}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${c.svg}</svg></div><div class="n">${c.n}</div><div class="l">${esc(c.l)}</div></div>`).join('');
   const cont=document.getElementById('tbl-gastos');
   if(!gastosFiltrados.length){cont.innerHTML='<div class="tbl-empty">No hay gastos'+(destFiltro?' para "'+esc(destFiltro)+'"':' registrados todavía')+'.</div>';return;}
