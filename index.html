@@ -419,6 +419,8 @@ const NAV={
     {v:'reportes',label:'Reportes',svg:'<path d="M4 4h12l4 4v12H4z"/><path d="M9 13l2 2 4-4"/>'},
     {v:'usuarios',label:'Usuarios',svg:'<rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'},
     {v:'config',label:'Configuración',svg:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3 1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8 1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>'},
+    {v:'_grupos', label:'Formador de Grupos',
+     svg:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>'},
     {v:'ayuda',label:'Ayuda',svg:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 4 1.8c0 1.7-2.5 2-2.5 3.2M12 17h.01"/>'}
   ],
   usuario:[
@@ -445,6 +447,7 @@ function irA(v){
   if(v==='dashboard')pintarDashboard();if(v==='mi-estado')pintarMiEstado();if(v==='personas')pintarPersonas();
   if(v==='pagos'){pintarPagosMesSelect();pintarPagosDestinoFiltro();pintarPagosTabla();}if(v==='gastos'){pintarGastosDestinoFiltro();pintarGastos();}
   if(v==='reportes'){pintarReportesFiltros();pintarReportes();}if(v==='usuarios')pintarUsuarios();if(v==='config')pintarConfig();
+  if (v === '_grupos') { window.open('grupos/', '_blank'); return; }
 }
 document.getElementById('menu-btn').addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('open'));
 
