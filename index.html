@@ -134,7 +134,7 @@
   .modal-h{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border)}
   .modal-h h3{font-size:1.1rem;font-weight:700}
   .modal-x{background:none;border:none;font-size:1.4rem;color:var(--text-soft);line-height:1;cursor:pointer}
-  .modal-b{padding:22px}
+  .modal-b{padding:22px;max-height:calc(100vh - 180px);overflow-y:auto}
   .modal-b .field{margin-bottom:14px}
   .field label{display:block;font-size:.82rem;font-weight:500;color:var(--text-dim);margin-bottom:6px}
   .field input,.field select{width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px 13px;font-size:.94rem;color:var(--text);font-family:inherit}
@@ -356,7 +356,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbwwroaYNMes4AiG_F1L2sS5NX3QCQROkYSaYzgM1QMtUpAJuoNY1td96g_BpdEL4xNKSA/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbxtOdk4-9zlFoOHfwOcPVnQs37euxEh4cChVjpPYA8skvEp7VsCqwgDP6aBmFLDluoS1A/exec";
 
 const MESES_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const _mem = {};
